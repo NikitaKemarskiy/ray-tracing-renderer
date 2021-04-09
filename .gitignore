@@ -1,0 +1,10 @@
+# IntelliJ IDEA files
+.idea
+target
+
+# Project files
+renders/*
+!renders/.gitkeep
+
+# OS files
+.DS_Store
