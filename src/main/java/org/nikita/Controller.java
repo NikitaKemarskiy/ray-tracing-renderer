@@ -1,9 +1,11 @@
 package org.nikita;
 
-import org.nikita.formats.Image;
+import com.paulok777.formats.Image;
+import com.paulok777.writers.PpmImageWriter;
 import org.nikita.renderer.RayTracingObjRenderer;
 import org.nikita.renderer.Renderer;
 
+import java.io.File;
 import java.io.IOException;
 
 public class Controller {
@@ -13,7 +15,9 @@ public class Controller {
 
         try {
             Image image = renderer.render(source);
-            System.out.println(image.getPixels().size());
+            PpmImageWriter ppmImageWriter = new PpmImageWriter(new File("my.ppm"));
+            ppmImageWriter.write(image);
+            System.out.println(image.getPixels().length);
         } catch (IOException err) {
             System.err.println(err);
         }

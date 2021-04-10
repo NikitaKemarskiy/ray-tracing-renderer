@@ -1,6 +1,6 @@
 package org.nikita.renderer;
 
-import org.nikita.formats.Image;
+import com.paulok777.formats.Image;
 
 import java.io.IOException;
 

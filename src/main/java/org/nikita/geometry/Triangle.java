@@ -2,6 +2,7 @@ package org.nikita.geometry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,19 @@ public class Triangle {
 
     public List<Vector> getVertices() {
         return vertices;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Triangle triangle = (Triangle) o;
+        return Objects.equals(vertices, triangle.vertices);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(vertices);
     }
 
     @Override
