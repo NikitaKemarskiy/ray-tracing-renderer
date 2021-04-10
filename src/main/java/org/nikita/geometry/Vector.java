@@ -1,7 +1,5 @@
 package org.nikita.geometry;
 
-import java.util.stream.Collectors;
-
 public class Vector {
     private double x;
     private double y;
@@ -40,16 +38,31 @@ public class Vector {
     }
 
     public double getCoordinateValue(Axis axis) {
-        switch (axis) {
-            case X:
-                return getX();
-            case Y:
-                return getY();
-            case Z:
-                return getZ();
-            default:
-                return 0;
-        }
+        return switch (axis) {
+            case X -> getX();
+            case Y -> getY();
+            case Z -> getZ();
+        };
+    }
+
+    public Vector crossProduct(Vector vector) {
+        return new Vector(
+            this.y * vector.z - this.z * vector.y,
+            this.z * vector.x - this.x * vector.z,
+            this.x * vector.y - this.y * vector.x
+        );
+    }
+
+    public double dotProduct(Vector vector) {
+        return this.x * vector.x + this.y * vector.y + this.z * vector.z;
+    }
+
+    public Vector subtract(Vector vector) {
+        return new Vector(
+            this.x - vector.x,
+            this.y - vector.y,
+            this.z - vector.z
+        );
     }
 
     @Override

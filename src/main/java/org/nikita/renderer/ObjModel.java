@@ -1,7 +1,7 @@
 package org.nikita.renderer;
 
 import de.javagl.obj.*;
-import org.nikita.geometry.Polygon;
+import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
 
 import java.io.FileInputStream;
@@ -12,32 +12,20 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ObjModel {
-    private Set<Polygon> polygons;
+    private Set<Triangle> triangles;
 
     private void updateMinCoordinates(Vector minCoordinates, Vector vertex) {
-        minCoordinates.setX(
-            minCoordinates.getX() < vertex.getX()
-                ? minCoordinates.getX()
-                : vertex.getX()
-        );
-        minCoordinates.setY(
-                minCoordinates.getY() < vertex.getY()
-                    ? minCoordinates.getY()
-                    : vertex.getY()
-        );
-        minCoordinates.setZ(
-                minCoordinates.getZ() < vertex.getZ()
-                    ? minCoordinates.getZ()
-                    : vertex.getZ()
-        );
+        minCoordinates.setX(Math.min(minCoordinates.getX(), vertex.getX()));
+        minCoordinates.setY(Math.min(minCoordinates.getY(), vertex.getY()));
+        minCoordinates.setZ(Math.min(minCoordinates.getZ(), vertex.getZ()));
     }
 
     private void updatePolygonsPosition(Vector minCoordinates, Vector position) {
         double xDiff = position.getX() - minCoordinates.getX();
         double yDiff = position.getY() - minCoordinates.getY();
         double zDiff = position.getZ() - minCoordinates.getZ();
-        for (Polygon polygon : polygons) {
-            for (Vector vertex : polygon.getVertices()) {
+        for (Triangle triangle : triangles) {
+            for (Vector vertex : triangle.getVertices()) {
                 vertex.setX(vertex.getX() + xDiff);
                 vertex.setX(vertex.getY() + yDiff);
                 vertex.setX(vertex.getZ() + zDiff);
@@ -46,7 +34,7 @@ public class ObjModel {
     }
 
     public ObjModel(String source, Vector position) throws IOException {
-        polygons = new HashSet<>();
+        triangles = new HashSet<>();
 
         try (InputStream inputStream = new FileInputStream(source)) {
             Obj obj = ObjUtils.convertToRenderable(ObjReader.read(inputStream));
@@ -54,7 +42,7 @@ public class ObjModel {
 
             for (int faceIndex = 0; faceIndex < obj.getNumFaces(); faceIndex++) {
                 ObjFace face = obj.getFace(faceIndex);
-                Polygon polygon = new Polygon();
+                Triangle triangle = new Triangle();
                 for (int vertexNumber = 0; vertexNumber < face.getNumVertices(); vertexNumber++) {
                     FloatTuple floatTuple = obj.getVertex(face.getVertexIndex(vertexNumber));
                     Vector vector = new Vector(
@@ -63,29 +51,25 @@ public class ObjModel {
                         floatTuple.getZ()
                     );
                     updateMinCoordinates(minCoordinates, vector);
-                    polygon.addVertex(vector);
+                    triangle.addVertex(vector);
                 }
-                polygons.add(polygon);
+                triangles.add(triangle);
             }
 
             updatePolygonsPosition(minCoordinates, position);
         }
     }
 
-    public Set<Polygon> getPolygons() {
-        return polygons;
-    }
-
-    public void setPolygons(Set<Polygon> polygons) {
-        this.polygons = polygons;
+    public Set<Triangle> getTriangles() {
+        return triangles;
     }
 
     @Override
     public String toString() {
         return String.format(
             "Polygons: [%s]",
-            polygons.stream()
-                .map(polygon -> String.format("{ %s }", polygon.toString()))
+            triangles.stream()
+                .map(triangle -> String.format("{ %s }", triangle.toString()))
                 .collect(Collectors.joining(", "))
         );
     }

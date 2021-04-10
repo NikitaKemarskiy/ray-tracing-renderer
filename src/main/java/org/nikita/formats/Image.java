@@ -1,12 +1,11 @@
 package org.nikita.formats;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Image {
-    private int height;
     private int width;
+    private int height;
     private List<Pixel> pixels;
 
     public Image(int width, int height) {

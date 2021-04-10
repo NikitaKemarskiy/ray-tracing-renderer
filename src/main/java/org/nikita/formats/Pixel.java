@@ -5,6 +5,9 @@ public class Pixel {
     private byte green;
     private byte blue;
 
+    public final static Pixel BLACK = new Pixel((byte) 0, (byte) 0, (byte) 0);
+    public final static Pixel WHITE = new Pixel((byte) 255, (byte) 255, (byte) 255);
+
     public Pixel(byte red, byte green, byte blue) {
         this.red = red;
         this.green = green;
