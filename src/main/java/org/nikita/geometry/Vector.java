@@ -7,6 +7,8 @@ public class Vector {
     private double y;
     private double z;
 
+    public static final Vector ZERO = new Vector(0, 0, 0);
+
     public Vector(double x, double y, double z) {
         this.x = x;
         this.y = y;
@@ -35,6 +37,19 @@ public class Vector {
 
     public void setZ(double z) {
         this.z = z;
+    }
+
+    public double getCoordinateValue(Axis axis) {
+        switch (axis) {
+            case X:
+                return getX();
+            case Y:
+                return getY();
+            case Z:
+                return getZ();
+            default:
+                return 0;
+        }
     }
 
     @Override

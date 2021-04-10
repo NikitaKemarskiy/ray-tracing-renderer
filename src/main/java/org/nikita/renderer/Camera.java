@@ -4,11 +4,9 @@ import org.nikita.geometry.Vector;
 
 public class Camera {
     private Vector position;
-    private Vector direction;
 
-    public Camera(Vector position, Vector direction) {
+    public Camera(Vector position) {
         this.position = position;
-        this.direction = direction;
     }
 
     public Vector getPosition() {
@@ -17,13 +15,5 @@ public class Camera {
 
     public void setPosition(Vector position) {
         this.position = position;
-    }
-
-    public Vector getDirection() {
-        return direction;
-    }
-
-    public void setDirection(Vector direction) {
-        this.direction = direction;
     }
 }

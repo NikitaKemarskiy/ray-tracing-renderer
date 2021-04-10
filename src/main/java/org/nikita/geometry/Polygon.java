@@ -20,6 +20,14 @@ public class Polygon {
         vertices.add(vertex);
     }
 
+    public Set<Vector> getVertices() {
+        return vertices;
+    }
+
+    public void setVertices(Set<Vector> vertices) {
+        this.vertices = vertices;
+    }
+
     @Override
     public String toString() {
         return vertices.stream()

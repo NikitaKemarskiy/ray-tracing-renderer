@@ -1,7 +1,6 @@
 package org.nikita.formats;
 
 public class Pixel {
-
     private byte red;
     private byte green;
     private byte blue;

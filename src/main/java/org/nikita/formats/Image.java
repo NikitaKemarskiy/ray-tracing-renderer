@@ -1,13 +1,18 @@
 package org.nikita.formats;
 
-public class Image {
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
+public class Image {
     private int height;
     private int width;
-    private Pixel[] pixels;
+    private List<Pixel> pixels;
 
-    public Pixel getPixel(int x, int y) {
-        return pixels[y * width + x];
+    public Image(int width, int height) {
+        this.width = width;
+        this.height = height;
+        pixels = new LinkedList<>();
     }
 
     public int getHeight() {
@@ -26,19 +31,16 @@ public class Image {
         this.width = width;
     }
 
-    public Pixel[] getPixels() {
-        return pixels;
+    public void addPixel(Pixel pixel) {
+        this.pixels.add(pixel);
     }
 
-    public void setPixels(Pixel[] pixels) {
-        this.pixels = pixels;
+    public List<Pixel> getPixels() {
+        return pixels;
     }
 
     @Override
     public String toString() {
-        return "Image{" +
-                "height=" + height +
-                ", width=" + width +
-                '}';
+        return String.format("Image { width: %d; height: %d }", width, height);
     }
 }

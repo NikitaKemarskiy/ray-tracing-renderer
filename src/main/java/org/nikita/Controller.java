@@ -1,6 +1,6 @@
 package org.nikita;
 
-import org.nikita.renderer.RayTracingRenderer;
+import org.nikita.renderer.RayTracingObjRenderer;
 import org.nikita.renderer.Renderer;
 
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.io.IOException;
 public class Controller {
     public static void main(String[] args) {
         String source = "models/cow/cow.obj";
-        Renderer renderer = new RayTracingRenderer();
+        Renderer renderer = new RayTracingObjRenderer();
 
         try {
             renderer.render(source);
