@@ -11,13 +11,13 @@ import org.nikita.geometry.Vector;
 import java.io.IOException;
 
 public class RayTracingObjRenderer implements Renderer {
-    private final static Vector DEFAULT_MODEL_POSITION = new Vector(0, 0, 20);
+    private final static Vector DEFAULT_MODEL_POSITION = new Vector(0, 0, 2);
     private final static Vector DEFAULT_CAMERA_POSITION = Vector.ZERO;
     private final static Vector DEFAULT_SCREEN_CENTER = new Vector(0, 0, 1);
     private final static Axis DEFAULT_SCREEN_AXIS_PARALLEL_TO = Axis.X;
     private final static Axis DEFAULT_SCREEN_AXIS_NORMAL_TO = Axis.Z;
-    private final static int DEFAULT_SCREEN_WIDTH = 800;
-    private final static int DEFAULT_SCREEN_HEIGHT = 600;
+    private final static int DEFAULT_SCREEN_WIDTH = 10;
+    private final static int DEFAULT_SCREEN_HEIGHT = 10;
 
     private RayTriangleIntersectionSolver rayTriangleIntersectionSolver;
 

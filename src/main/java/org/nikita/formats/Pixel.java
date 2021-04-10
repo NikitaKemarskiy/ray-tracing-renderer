@@ -28,10 +28,6 @@ public class Pixel {
 
     @Override
     public String toString() {
-        return "Pixel{" +
-                "red=" + red +
-                ", green=" + green +
-                ", blue=" + blue +
-                '}';
+        return String.format("Pixel { red: %d, green: %s, blue: %s }", red, green, blue);
     }
 }

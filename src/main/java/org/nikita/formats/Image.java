@@ -11,7 +11,7 @@ public class Image {
     public Image(int width, int height) {
         this.width = width;
         this.height = height;
-        pixels = new LinkedList<>();
+        this.pixels = new LinkedList<>();
     }
 
     public int getHeight() {
