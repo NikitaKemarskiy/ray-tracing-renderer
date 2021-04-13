@@ -24,6 +24,46 @@ public class TriangleBoundingBox {
             vertex.getZ() <= Math.max(vertex1.getZ(), vertex2.getZ());
     }
 
+    private double getIntersectionDistanceWithRay(Vector from, Vector ray) {
+        double rayXReverse = 1 / ray.getX();
+        double rayYReverse = 1 / ray.getY();
+        double rayZReverse = 1 / ray.getZ();
+
+        double t1 = (vertex1.getX() - from.getX()) * rayXReverse;
+        double t2 = (vertex2.getX() - from.getX()) * rayXReverse;
+        double t3 = (vertex1.getY() - from.getY()) * rayYReverse;
+        double t4 = (vertex2.getY() - from.getY()) * rayYReverse;
+        double t5 = (vertex1.getZ() - from.getZ()) * rayZReverse;
+        double t6 = (vertex2.getZ() - from.getZ()) * rayZReverse;
+
+        double tMin = Math.max(Math.max(Math.min(t1, t2), Math.min(t3, t4)), Math.min(t5, t6));
+        double tMax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));
+
+        if (tMax < 0) {
+            return -1;
+        } else if (tMin > tMax) {
+            return -1;
+        } else {
+            return tMin;
+        }
+    }
+
+    private TriangleBoundingBox getClosestChildToRay(Vector from, Vector ray) {
+        double minIntersectionDistance = Double.MAX_VALUE;
+        TriangleBoundingBox closestChildToRay = null;
+
+        for (TriangleBoundingBox child : children) {
+            double intersectionDistance = child.getIntersectionDistanceWithRay(from, ray);
+
+            if (intersectionDistance < minIntersectionDistance) {
+                minIntersectionDistance = intersectionDistance;
+                closestChildToRay = child;
+            }
+        }
+
+        return closestChildToRay;
+    }
+
     private TriangleBoundingBox getChild(Vector vertex) {
         for (TriangleBoundingBox child : children) {
             if (child.vertexBelongsTo(vertex)) {
@@ -86,6 +126,27 @@ public class TriangleBoundingBox {
 
         if (triangleBelongsTo) {
             triangles.add(triangle);
+        }
+    }
+
+    public Set<Triangle> getTrianglesByRay(Vector from, Vector ray) {
+        double intersectionDistance = getIntersectionDistanceWithRay(from, ray);
+
+        System.out.println("From: " + from);
+        System.out.println("Ray: " + ray);
+        System.out.println("Intersection distance: " + intersectionDistance);
+
+        if (intersectionDistance == -1) {
+            return null;
+        }
+
+        TriangleBoundingBox closestChildToRay = getClosestChildToRay(from, ray);
+
+        if (closestChildToRay != null) {
+            Set<Triangle> childTrianglesByRay = closestChildToRay.getTrianglesByRay(from, ray);
+            return childTrianglesByRay.size() > 0 ? childTrianglesByRay : triangles;
+        } else {
+            return triangles;
         }
     }
 

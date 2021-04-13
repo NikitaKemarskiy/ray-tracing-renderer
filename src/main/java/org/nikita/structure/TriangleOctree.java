@@ -3,6 +3,8 @@ package org.nikita.structure;
 import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
 
+import java.util.Set;
+
 public class TriangleOctree implements TriangleTree {
     private TriangleBoundingBox root;
 
@@ -12,6 +14,10 @@ public class TriangleOctree implements TriangleTree {
 
     public void addTriangle(Triangle triangle) {
         root.addTriangle(triangle);
+    }
+
+    public Set<Triangle> getTrianglesByRay(Vector from, Vector ray) {
+        return root.getTrianglesByRay(from, ray);
     }
 
     @Override

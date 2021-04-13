@@ -2,12 +2,8 @@ package org.nikita.renderer;
 
 import com.paulok777.formats.Image;
 import com.paulok777.formats.Pixel;
-import org.nikita.calculation.MollerTrumboreSolver;
-import org.nikita.calculation.RayTriangleIntersectionSolver;
 import org.nikita.geometry.Axis;
-import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
-import org.nikita.structure.TriangleTree;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,25 +13,14 @@ import static org.nikita.formats.Color.BLACK;
 import static org.nikita.formats.Color.WHITE;
 
 public class RayTracingObjRenderer implements Renderer {
-    private final static int DEFAULT_MODEL_MIN_POSITION = 2;
-    private final static Vector DEFAULT_CAMERA_POSITION = Vector.ZERO;
-    private final static Vector DEFAULT_SCREEN_CENTER = new Vector(0, 0, 1);
+    private final static double DEFAULT_MODEL_MIN_POSITION = 1.5;
+    private final static Vector DEFAULT_CAMERA_POSITION = new Vector(0, 0, 0);
+    private final static Vector DEFAULT_SCREEN_CENTER = new Vector(0, 1, 0);
     private final static Axis DEFAULT_SCREEN_WIDTH_AXIS = Axis.X;
-    private final static Axis DEFAULT_SCREEN_HEIGHT_AXIS = Axis.Y;
-    private final static Axis DEFAULT_SCREEN_NORMAL_AXIS = Axis.Z;
-    private final static int DEFAULT_SCREEN_PIXEL_WIDTH = 600;
-    private final static int DEFAULT_SCREEN_PIXEL_HEIGHT = 600;
-
-    private RayTriangleIntersectionSolver rayTriangleIntersectionSolver;
-
-    private boolean hasIntersection(Vector cameraPosition, Vector ray, ObjModel objModel) {
-        for (Triangle triangle : objModel.getTriangles()) {
-            if (rayTriangleIntersectionSolver.intersects(cameraPosition, ray, triangle)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    private final static Axis DEFAULT_SCREEN_HEIGHT_AXIS = Axis.Z;
+    private final static Axis DEFAULT_SCREEN_NORMAL_AXIS = Axis.Y;
+    private final static int DEFAULT_SCREEN_PIXEL_WIDTH = 500;
+    private final static int DEFAULT_SCREEN_PIXEL_HEIGHT = 500;
 
     private Image renderImageFromObjModel(ObjModel objModel, Screen screen, Vector cameraPosition) {
         Image image = new Image();
@@ -55,15 +40,15 @@ public class RayTracingObjRenderer implements Renderer {
 
         List<Pixel> pixels = new ArrayList<>();
 
-        for (double h = screenMinByHeightAxis; h < screenMaxByHeightAxis; h += screenHeightStep) {
+        for (double h = screenMaxByHeightAxis; h > screenMinByHeightAxis; h -= screenHeightStep) {
             for (double w = screenMinByWidthAxis; w < screenMaxByWidthAxis; w += screenWidthStep) {
-                Vector ray = Vector.ZERO;
+                Vector ray = new Vector(0, 0, 0);
 
                 ray.setCoordinateValue(w, screenWidthAxis);
                 ray.setCoordinateValue(h, screenHeightAxis);
                 ray.setCoordinateValue(screenPositionByNormalAxis, screenNormalAxis);
 
-                Pixel pixel = hasIntersection(cameraPosition, ray, objModel) ? BLACK : WHITE;
+                Pixel pixel = objModel.hasIntersectionWithRay(cameraPosition, ray) ? BLACK : WHITE;
                 pixels.add(pixel);
             }
         }
@@ -73,10 +58,6 @@ public class RayTracingObjRenderer implements Renderer {
         image.setPixels(pixels.toArray(new Pixel[0]));
 
         return image;
-    }
-
-    public RayTracingObjRenderer() {
-        rayTriangleIntersectionSolver = new MollerTrumboreSolver();
     }
 
     @Override
@@ -92,7 +73,6 @@ public class RayTracingObjRenderer implements Renderer {
         );
 
         objModel.setMin(DEFAULT_MODEL_MIN_POSITION, DEFAULT_SCREEN_NORMAL_AXIS);
-        TriangleTree triangleTree = objModel.buildTree();
 
         return renderImageFromObjModel(objModel, screen, DEFAULT_CAMERA_POSITION);
     }

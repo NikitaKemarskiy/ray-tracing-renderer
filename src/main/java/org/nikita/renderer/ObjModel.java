@@ -1,6 +1,8 @@
 package org.nikita.renderer;
 
 import de.javagl.obj.*;
+import org.nikita.calculation.MollerTrumboreSolver;
+import org.nikita.calculation.RayTriangleIntersectionSolver;
 import org.nikita.geometry.Axis;
 import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
@@ -15,7 +17,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ObjModel {
+    private TriangleTree triangleTree;
     private Set<Triangle> triangles;
+    private RayTriangleIntersectionSolver rayTriangleIntersectionSolver;
 
     private Vector getMinCoordinates() {
         Vector minCoordinates = new Vector(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
@@ -45,8 +49,20 @@ public class ObjModel {
         return maxCoordinates;
     }
 
+    private void buildTree() {
+        Vector minCoordinates = getMinCoordinates();
+        Vector maxCoordinates = getMaxCoordinates();
+
+        triangleTree = new TriangleOctree(minCoordinates, maxCoordinates, 3);
+
+        for (Triangle triangle : triangles) {
+            triangleTree.addTriangle(triangle);
+        }
+    }
+
     public ObjModel(String source) throws IOException {
         triangles = new HashSet<>();
+        rayTriangleIntersectionSolver = new MollerTrumboreSolver();
 
         try (InputStream inputStream = new FileInputStream(source)) {
             Obj obj = ObjUtils.convertToRenderable(ObjReader.read(inputStream));
@@ -66,12 +82,19 @@ public class ObjModel {
                 triangles.add(triangle);
             }
         }
-    }
 
-    public Set<Triangle> getTriangles() {
-        return triangles;
+        buildTree();
     }
-
+    
+    public boolean hasIntersectionWithRay(Vector from, Vector ray) {
+        for (Triangle triangle : triangleTree.getTrianglesByRay(from, ray)) {
+            if (rayTriangleIntersectionSolver.intersects(from, ray, triangle)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public void setMin(double minValue, Axis axis) {
         Vector minCoordinates = getMinCoordinates();
 
@@ -90,19 +113,8 @@ public class ObjModel {
                 };
             }
         }
-    }
 
-    public TriangleTree buildTree() {
-        Vector minCoordinates = getMinCoordinates();
-        Vector maxCoordinates = getMaxCoordinates();
-
-        TriangleTree triangleTree = new TriangleOctree(minCoordinates, maxCoordinates, 3);
-
-        for (Triangle triangle : triangles) {
-            triangleTree.addTriangle(triangle);
-        }
-
-        return triangleTree;
+        buildTree();
     }
 
     @Override

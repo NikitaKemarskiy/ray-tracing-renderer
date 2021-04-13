@@ -7,8 +7,6 @@ public class Vector {
     private double y;
     private double z;
 
-    public static final Vector ZERO = new Vector(0, 0, 0);
-
     public static Vector from(Vector vector) {
         return new Vector(vector.getX(), vector.getY(), vector.getZ());
     }
