@@ -1,8 +1,11 @@
 package org.nikita.renderer;
 
 import de.javagl.obj.*;
+import org.nikita.geometry.Axis;
 import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
+import org.nikita.structure.TriangleOctree;
+import org.nikita.structure.TriangleTree;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,31 +17,39 @@ import java.util.stream.Collectors;
 public class ObjModel {
     private Set<Triangle> triangles;
 
-    private void updateMinCoordinates(Vector minCoordinates, Vector vertex) {
-        minCoordinates.setX(Math.min(minCoordinates.getX(), vertex.getX()));
-        minCoordinates.setY(Math.min(minCoordinates.getY(), vertex.getY()));
-        minCoordinates.setZ(Math.min(minCoordinates.getZ(), vertex.getZ()));
-    }
+    private Vector getMinCoordinates() {
+        Vector minCoordinates = new Vector(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
 
-    private void updatePolygonsPosition(Vector minCoordinates, Vector position) {
-        double xDiff = position.getX() - minCoordinates.getX();
-        double yDiff = position.getY() - minCoordinates.getY();
-        double zDiff = position.getZ() - minCoordinates.getZ();
         for (Triangle triangle : triangles) {
             for (Vector vertex : triangle.getVertices()) {
-                vertex.setX(vertex.getX() + xDiff);
-                vertex.setX(vertex.getY() + yDiff);
-                vertex.setX(vertex.getZ() + zDiff);
+                minCoordinates.setX(Math.min(minCoordinates.getX(), vertex.getX()));
+                minCoordinates.setY(Math.min(minCoordinates.getY(), vertex.getY()));
+                minCoordinates.setZ(Math.min(minCoordinates.getZ(), vertex.getZ()));
             }
         }
+
+        return minCoordinates;
     }
 
-    public ObjModel(String source, Vector position) throws IOException {
+    private Vector getMaxCoordinates() {
+        Vector maxCoordinates = new Vector(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
+
+        for (Triangle triangle : triangles) {
+            for (Vector vertex : triangle.getVertices()) {
+                maxCoordinates.setX(Math.max(maxCoordinates.getX(), vertex.getX()));
+                maxCoordinates.setY(Math.max(maxCoordinates.getY(), vertex.getY()));
+                maxCoordinates.setZ(Math.max(maxCoordinates.getZ(), vertex.getZ()));
+            }
+        }
+
+        return maxCoordinates;
+    }
+
+    public ObjModel(String source) throws IOException {
         triangles = new HashSet<>();
 
         try (InputStream inputStream = new FileInputStream(source)) {
             Obj obj = ObjUtils.convertToRenderable(ObjReader.read(inputStream));
-            Vector minCoordinates = new Vector(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
 
             for (int faceIndex = 0; faceIndex < obj.getNumFaces(); faceIndex++) {
                 ObjFace face = obj.getFace(faceIndex);
@@ -50,18 +61,48 @@ public class ObjModel {
                         floatTuple.getY(),
                         floatTuple.getZ()
                     );
-                    updateMinCoordinates(minCoordinates, vector);
                     triangle.addVertex(vector);
                 }
                 triangles.add(triangle);
             }
-
-            updatePolygonsPosition(minCoordinates, position);
         }
     }
 
     public Set<Triangle> getTriangles() {
         return triangles;
+    }
+
+    public void setMin(double minValue, Axis axis) {
+        Vector minCoordinates = getMinCoordinates();
+
+        double diff = minValue - switch (axis) {
+            case X -> minCoordinates.getX();
+            case Y -> minCoordinates.getY();
+            case Z -> minCoordinates.getZ();
+        };
+
+        for (Triangle triangle : triangles) {
+            for (Vector vertex : triangle.getVertices()) {
+                switch (axis) {
+                    case X -> vertex.setX(vertex.getX() + diff);
+                    case Y -> vertex.setY(vertex.getY() + diff);
+                    case Z -> vertex.setZ(vertex.getZ() + diff);
+                };
+            }
+        }
+    }
+
+    public TriangleTree buildTree() {
+        Vector minCoordinates = getMinCoordinates();
+        Vector maxCoordinates = getMaxCoordinates();
+
+        TriangleTree triangleTree = new TriangleOctree(minCoordinates, maxCoordinates, 3);
+
+        for (Triangle triangle : triangles) {
+            triangleTree.addTriangle(triangle);
+        }
+
+        return triangleTree;
     }
 
     @Override

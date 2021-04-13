@@ -9,6 +9,10 @@ public class Vector {
 
     public static final Vector ZERO = new Vector(0, 0, 0);
 
+    public static Vector from(Vector vector) {
+        return new Vector(vector.getX(), vector.getY(), vector.getZ());
+    }
+
     public Vector(double x, double y, double z) {
         this.x = x;
         this.y = y;
@@ -47,6 +51,14 @@ public class Vector {
         };
     }
 
+    public void setCoordinateValue(double value, Axis axis) {
+        switch (axis) {
+            case X -> setX(value);
+            case Y -> setY(value);
+            case Z -> setZ(value);
+        };
+    }
+
     public Vector crossProduct(Vector vector) {
         return new Vector(
             this.y * vector.z - this.z * vector.y,
@@ -64,6 +76,22 @@ public class Vector {
             this.x - vector.x,
             this.y - vector.y,
             this.z - vector.z
+        );
+    }
+
+    public Vector add(Vector vector) {
+        return new Vector(
+                this.x + vector.x,
+                this.y + vector.y,
+                this.z + vector.z
+        );
+    }
+
+    public Vector divide(Vector vector) {
+        return new Vector(
+                this.x / vector.x,
+                this.y / vector.y,
+                this.z / vector.z
         );
     }
 

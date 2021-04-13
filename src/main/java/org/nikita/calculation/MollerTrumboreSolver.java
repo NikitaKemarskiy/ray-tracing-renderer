@@ -6,18 +6,18 @@ import org.nikita.geometry.Vector;
 import java.util.Iterator;
 
 public class MollerTrumboreSolver implements RayTriangleIntersectionSolver {
-    private static final double EPSILON = 1e-7;
+    private static final double EPSILON = 1e-8;
 
     @Override
-    public boolean intersects(Vector ray, Triangle triangle) {
+    public boolean intersects(Vector from, Vector ray, Triangle triangle) {
         Iterator<Vector> verticesIterator = triangle.getVertices().iterator();
 
-        Vector vector0 = verticesIterator.next();
-        Vector vector1 = verticesIterator.next();
-        Vector vector2 = verticesIterator.next();
+        Vector vertex0 = verticesIterator.next();
+        Vector vertex1 = verticesIterator.next();
+        Vector vertex2 = verticesIterator.next();
 
-        Vector edge1 = vector1.subtract(vector0);
-        Vector edge2 = vector2.subtract(vector0);
+        Vector edge1 = vertex1.subtract(vertex0);
+        Vector edge2 = vertex2.subtract(vertex0);
 
         Vector h = ray.crossProduct(edge2);
         double a = edge1.dotProduct(h);
@@ -27,7 +27,7 @@ public class MollerTrumboreSolver implements RayTriangleIntersectionSolver {
         }
 
         double f = 1 / a;
-        Vector s = ray.subtract(vector0);
+        Vector s = from.subtract(vertex0);
         double u = f * s.dotProduct(h);
 
         if (u < 0 || u > 1) {

@@ -3,68 +3,77 @@ package org.nikita.renderer;
 import org.nikita.geometry.Axis;
 import org.nikita.geometry.Vector;
 
-public class Screen {
-    private Vector center;
-    /**
-     * Parallel to means that screen is parallel to the
-     * specified axis. For example, if parallelTo == Axis.X,
-     * then width is considered as size by X axis
-     */
-    private Axis parallelTo;
-    /**
-     * Parallel to means that screen is perpendicular to the
-     * specified axis. For example, if parallelTo == Axis.X and normalTo == Axis.Z,
-     * then height is considered as size by Y axis
-     */
-    private Axis normalTo;
-    private int width;
-    private int height;
+import java.math.BigDecimal;
 
-    public Screen(Vector center, Axis parallelTo, Axis normalTo, int width, int height) {
+public class Screen {
+    private final static double WIDTH = 1;
+    private final static double HEIGHT = 1;
+
+    private Vector center;
+    private Axis widthAxis;
+    private Axis heightAxis;
+    private Axis normalAxis;
+    private int pixelWidth;
+    private int pixelHeight;
+
+    public Screen(Vector center, Axis widthAxis, Axis heightAxis, Axis normalAxis, int pixelWidth, int pixelHeight) {
         this.center = center;
-        this.parallelTo = parallelTo;
-        this.normalTo = normalTo;
-        this.width = width;
-        this.height = height;
+        this.widthAxis = widthAxis;
+        this.heightAxis = heightAxis;
+        this.normalAxis = normalAxis;
+        this.pixelWidth = pixelWidth;
+        this.pixelHeight = pixelHeight;
     }
 
     public Vector getCenter() {
         return center;
     }
 
-    public void setCenter(Vector center) {
-        this.center = center;
-    }
-
     public double getMin(Axis axis) {
-        return normalTo == axis
-            ? center.getCoordinateValue(axis)
-            : center.getCoordinateValue(axis) - (
-                parallelTo == axis ? width : height
-            );
+        if (axis == normalAxis) {
+            return center.getCoordinateValue(axis);
+        } else if (axis == widthAxis) {
+            return center.getCoordinateValue(axis) - WIDTH / 2;
+        } else {
+            return center.getCoordinateValue(axis) - HEIGHT / 2;
+        }
     }
 
     public double getMax(Axis axis) {
-        return normalTo == axis
-            ? center.getCoordinateValue(axis)
-            : center.getCoordinateValue(axis) + (
-            parallelTo == axis ? width : height
-        );
+        if (axis == normalAxis) {
+            return center.getCoordinateValue(axis);
+        } else if (axis == widthAxis) {
+            return center.getCoordinateValue(axis) + WIDTH / 2;
+        } else {
+            return center.getCoordinateValue(axis) + HEIGHT / 2;
+        }
     }
 
-    public int getWidth() {
-        return width;
+    public double getWidthStep() {
+        return WIDTH / pixelWidth;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
+    public double getHeightStep() {
+        return HEIGHT / pixelHeight;
     }
 
-    public int getHeight() {
-        return height;
+    public int getPixelWidth() {
+        return pixelWidth;
     }
 
-    public void setHeight(int height) {
-        this.height = height;
+    public int getPixelHeight() {
+        return pixelHeight;
+    }
+
+    public Axis getNormalAxis() {
+        return normalAxis;
+    }
+
+    public Axis getWidthAxis() {
+        return widthAxis;
+    }
+
+    public Axis getHeightAxis() {
+        return heightAxis;
     }
 }
