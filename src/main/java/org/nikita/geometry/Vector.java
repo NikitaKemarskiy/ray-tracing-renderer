@@ -113,6 +113,10 @@ public class Vector {
         );
     }
 
+    public double getDistance(Vector vector) {
+        return Math.sqrt(Math.pow(x - vector.getX(), 2) + Math.pow(y - vector.getY(), 2) + Math.pow(z - vector.getZ(), 2));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -130,6 +134,6 @@ public class Vector {
 
     @Override
     public String toString() {
-        return String.format("(%.2f, %.2f, %.2f)", x, y, z);
+        return String.format("(%f, %f, %f)", x, y, z);
     }
 }

@@ -4,18 +4,20 @@ import de.javagl.obj.*;
 import org.nikita.calculation.NormalTriangleColorIntensitySolver;
 import org.nikita.calculation.TriangleColorIntensitySolver;
 import org.nikita.geometry.*;
+import org.nikita.geometry.Vector;
 import org.nikita.structure.TriangleOctree;
 import org.nikita.structure.TriangleTree;
+import org.nikita.util.MapUtil;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ObjModel {
     private Set<Triangle> triangles;
+    private Map<Vector, Vector> verticesNormals;
     private TriangleTree triangleTree;
     private Color color;
     private TriangleColorIntensitySolver triangleColorIntensitySolver;
@@ -59,6 +61,38 @@ public class ObjModel {
         }
     }
 
+    private void buildVerticesNormals(
+    ) {
+        Map<Integer, List<Vector>> vertexCoordinatesVerticesMap = new HashMap<>();
+        Map<Integer, List<Triangle>> vertexCoordinatesTrianglesMap = new HashMap<>();
+
+        for (Triangle triangle : triangles) {
+            for (Vector vertex : triangle.getVertices()) {
+                MapUtil.addToList(vertexCoordinatesVerticesMap, vertex.hashCode(), vertex);
+                MapUtil.addToList(vertexCoordinatesTrianglesMap, vertex.hashCode(), triangle);
+            }
+        }
+
+        for (Map.Entry<Integer, List<Vector>> entry : vertexCoordinatesVerticesMap.entrySet()) {
+            int vertexHash = entry.getKey();
+            List<Vector> vertices = entry.getValue();
+
+            List<Triangle> triangles = vertexCoordinatesTrianglesMap.get(vertexHash);
+
+            Vector vertexNormal = new Vector(0, 0, 0);
+
+            for (Triangle triangle : triangles) {
+                vertexNormal = vertexNormal.add(triangle.getNormal());
+            }
+
+            vertexNormal = vertexNormal.divide(triangles.size());
+
+            for (Vector vertex : vertices) {
+                verticesNormals.put(vertex, vertexNormal);
+            }
+        }
+    }
+
     public ObjModel(
         String source,
         Color color,
@@ -68,7 +102,12 @@ public class ObjModel {
         this.color = color;
 
         triangles = new HashSet<>();
-        triangleColorIntensitySolver = new NormalTriangleColorIntensitySolver(ambientLightIntensity, lightSourcePosition);
+        verticesNormals = new HashMap<>();
+        triangleColorIntensitySolver = new NormalTriangleColorIntensitySolver(
+            ambientLightIntensity,
+            lightSourcePosition,
+            verticesNormals
+        );
 
         try (InputStream inputStream = new FileInputStream(source)) {
             Obj obj = ObjUtils.convertToRenderable(ObjReader.read(inputStream));
@@ -77,19 +116,20 @@ public class ObjModel {
                 ObjFace face = obj.getFace(faceIndex);
                 Triangle triangle = new Triangle();
                 for (int vertexNumber = 0; vertexNumber < face.getNumVertices(); vertexNumber++) {
-                    FloatTuple floatTuple = obj.getVertex(face.getVertexIndex(vertexNumber));
-                    Vector vector = new Vector(
+                    int vertexIndex = face.getVertexIndex(vertexNumber);
+                    FloatTuple floatTuple = obj.getVertex(vertexIndex);
+
+                    Vector vertex = new Vector(
                         floatTuple.getX(),
                         floatTuple.getY(),
                         floatTuple.getZ()
                     );
-                    triangle.addVertex(vector);
+
+                    triangle.addVertex(vertex);
                 }
                 triangles.add(triangle);
             }
         }
-
-        buildTree();
     }
     
     public double getColorIntensity(Ray ray) {
@@ -123,8 +163,11 @@ public class ObjModel {
                 };
             }
         }
+    }
 
+    public void init() {
         buildTree();
+        buildVerticesNormals();
     }
 
     public Color getColor() {

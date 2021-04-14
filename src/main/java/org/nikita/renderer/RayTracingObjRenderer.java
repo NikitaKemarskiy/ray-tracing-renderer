@@ -95,6 +95,7 @@ public class RayTracingObjRenderer implements Renderer {
         );
 
         objModel.setMin(DEFAULT_MODEL_MIN_POSITION, DEFAULT_SCREEN_NORMAL_AXIS);
+        objModel.init();
 
         return renderImageFromObjModel(
             objModel,
