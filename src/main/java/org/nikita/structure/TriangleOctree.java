@@ -5,6 +5,7 @@ import org.nikita.calculation.RayTriangleIntersectionSolver;
 import org.nikita.geometry.Ray;
 import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
+import org.nikita.renderer.TriangleIntersection;
 
 public class TriangleOctree implements TriangleTree {
     private TriangleBoundingBox root;
@@ -19,8 +20,8 @@ public class TriangleOctree implements TriangleTree {
         root.addTriangle(triangle);
     }
 
-    public Triangle getTriangleIntersectingWithRay(Ray ray) {
-        return root.getTriangleIntersectingWithRay(ray, rayTriangleIntersectionSolver);
+    public TriangleIntersection getTriangleIntersectionWithRay(Ray ray) {
+        return root.getTriangleIntersectionWithRay(ray, rayTriangleIntersectionSolver);
     }
 
     @Override

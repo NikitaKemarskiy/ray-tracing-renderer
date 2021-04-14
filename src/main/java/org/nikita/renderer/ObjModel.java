@@ -68,7 +68,7 @@ public class ObjModel {
         this.color = color;
 
         triangles = new HashSet<>();
-        triangleColorIntensitySolver = new NormalTriangleColorIntensitySolver(ambientLightIntensity);
+        triangleColorIntensitySolver = new NormalTriangleColorIntensitySolver(ambientLightIntensity, lightSourcePosition);
 
         try (InputStream inputStream = new FileInputStream(source)) {
             Obj obj = ObjUtils.convertToRenderable(ObjReader.read(inputStream));
@@ -85,12 +85,6 @@ public class ObjModel {
                     );
                     triangle.addVertex(vector);
                 }
-                triangle.setColorIntensity(
-                    triangleColorIntensitySolver.getTriangleColorIntensity(
-                        triangle,
-                        lightSourcePosition
-                    )
-                );
                 triangles.add(triangle);
             }
         }
@@ -99,9 +93,16 @@ public class ObjModel {
     }
     
     public double getColorIntensity(Ray ray) {
-        Triangle triangleIntersectingWithRay = triangleTree.getTriangleIntersectingWithRay(ray);
+        TriangleIntersection triangleIntersectionWithRay = triangleTree.getTriangleIntersectionWithRay(ray);
 
-        return triangleIntersectingWithRay != null ? triangleIntersectingWithRay.getColorIntensity() : 0;
+        if (triangleIntersectionWithRay == null) {
+            return 0;
+        }
+
+        return triangleColorIntensitySolver.getTrianglePointColorIntensity(
+            triangleIntersectionWithRay.getTriangle(),
+            triangleIntersectionWithRay.getPoint()
+        );
     }
     
     public void setMin(double minValue, Axis axis) {

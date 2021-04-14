@@ -7,10 +7,6 @@ public class Vector {
     private double y;
     private double z;
 
-    public static Vector from(Vector vector) {
-        return new Vector(vector.getX(), vector.getY(), vector.getZ());
-    }
-
     public Vector(double x, double y, double z) {
         this.x = x;
         this.y = y;
@@ -75,9 +71,9 @@ public class Vector {
 
     public Vector add(Vector vector) {
         return new Vector(
-                this.x + vector.x,
-                this.y + vector.y,
-                this.z + vector.z
+            this.x + vector.x,
+            this.y + vector.y,
+            this.z + vector.z
         );
     }
 
@@ -86,6 +82,18 @@ public class Vector {
             this.x - vector.x,
             this.y - vector.y,
             this.z - vector.z
+        );
+    }
+
+    public double multiply(Vector vector) {
+        return x * vector.getX() + y * vector.getY() + z * vector.getZ();
+    }
+
+    public Vector multiply(double value) {
+        return new Vector(
+            this.x * value,
+            this.y * value,
+            this.z * value
         );
     }
 

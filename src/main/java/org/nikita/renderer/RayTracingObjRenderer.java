@@ -21,7 +21,7 @@ public class RayTracingObjRenderer implements Renderer {
     private final static Axis DEFAULT_SCREEN_NORMAL_AXIS = Axis.Y;
     private final static int DEFAULT_SCREEN_PIXEL_WIDTH = 1000;
     private final static int DEFAULT_SCREEN_PIXEL_HEIGHT = 1000;
-    private final static Color DEFAULT_OBJECT_COLOR = new Color(0, 255, 0);
+    private final static Color DEFAULT_OBJECT_COLOR = new Color(255, 255, 0);
     private final static Color DEFAULT_BACKGROUND_COLOR = Color.BLACK;
     private final static double DEFAULT_AMBIENT_LIGHT_INTENSITY = 0.1;
 

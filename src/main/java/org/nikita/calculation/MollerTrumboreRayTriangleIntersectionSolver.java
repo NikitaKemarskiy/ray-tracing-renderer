@@ -3,6 +3,7 @@ package org.nikita.calculation;
 import org.nikita.geometry.Ray;
 import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
+import org.nikita.renderer.TriangleIntersection;
 
 import java.util.Iterator;
 
@@ -10,7 +11,7 @@ public class MollerTrumboreRayTriangleIntersectionSolver implements RayTriangleI
     private static final double EPSILON = 1e-8;
 
     @Override
-    public double getRayTriangleIntersectionDistance(Ray ray, Triangle triangle) {
+    public TriangleIntersection getRayTriangleIntersection(Ray ray, Triangle triangle) {
         Vector origin = ray.getOrigin();
         Vector direction = ray.getDirection();
 
@@ -27,7 +28,7 @@ public class MollerTrumboreRayTriangleIntersectionSolver implements RayTriangleI
         double a = edge1.dotProduct(h);
 
         if (a > -EPSILON && a < EPSILON) {
-            return -1;
+            return null;
         }
 
         double f = 1 / a;
@@ -35,17 +36,24 @@ public class MollerTrumboreRayTriangleIntersectionSolver implements RayTriangleI
         double u = f * s.dotProduct(h);
 
         if (u < 0 || u > 1) {
-            return -1;
+            return null;
         }
 
         Vector q = s.crossProduct(edge1);
         double v = f * direction.dotProduct(q);
+
         if (v < 0 || u + v > 1) {
-            return -1;
+            return null;
         }
 
-        var t = f * edge2.dotProduct(q);
+        double distance = f * edge2.dotProduct(q);
 
-        return t;
+        if (distance <= EPSILON) {
+            return null;
+        }
+
+        Vector point = direction.multiply(distance).add(origin);
+
+        return new TriangleIntersection(triangle, point, distance);
     }
 }

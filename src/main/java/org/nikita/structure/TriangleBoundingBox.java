@@ -4,6 +4,7 @@ import org.nikita.calculation.RayTriangleIntersectionSolver;
 import org.nikita.geometry.Ray;
 import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
+import org.nikita.renderer.TriangleIntersection;
 
 import java.util.*;
 
@@ -157,7 +158,7 @@ public class TriangleBoundingBox {
         }
     }
 
-    public Triangle getTriangleIntersectingWithRay(
+    public TriangleIntersection getTriangleIntersectionWithRay(
         Ray ray,
         RayTriangleIntersectionSolver rayTriangleIntersectionSolver
     ) {
@@ -172,35 +173,34 @@ public class TriangleBoundingBox {
 
         if (childrenIntersectingWithRaySortedByDistance.size() > 0) {
             for (TriangleBoundingBox child : childrenIntersectingWithRaySortedByDistance) {
-                Triangle triangleIntersectingWithRay = child.getTriangleIntersectingWithRay(
+                TriangleIntersection triangleIntersectionWithRay = child.getTriangleIntersectionWithRay(
                     ray,
                     rayTriangleIntersectionSolver
                 );
 
-                if (triangleIntersectingWithRay != null) {
-                    return triangleIntersectingWithRay;
+                if (triangleIntersectionWithRay != null) {
+                    return triangleIntersectionWithRay;
                 }
             }
         }
 
-        double minIntersectionDistanceWithRay = -1;
-        Triangle triangleIntersectingWithRay = null;
+        TriangleIntersection minDistanceTriangleIntersection = null;
 
         for (Triangle triangle : triangles) {
-            double triangleIntersectionDistanceWithRay = rayTriangleIntersectionSolver.getRayTriangleIntersectionDistance(ray, triangle);
+            TriangleIntersection triangleIntersection = rayTriangleIntersectionSolver
+                .getRayTriangleIntersection(ray, triangle);
 
-            if (triangleIntersectionDistanceWithRay == -1) {
+            if (triangleIntersection == null) {
                 continue;
             } else if (
-                minIntersectionDistanceWithRay == -1 ||
-                triangleIntersectionDistanceWithRay < minIntersectionDistanceWithRay
+                minDistanceTriangleIntersection == null ||
+                triangleIntersection.getDistance() < minDistanceTriangleIntersection.getDistance()
             ) {
-                minIntersectionDistanceWithRay = triangleIntersectionDistanceWithRay;
-                triangleIntersectingWithRay = triangle;
+                minDistanceTriangleIntersection = triangleIntersection;
             }
         }
 
-        return triangleIntersectingWithRay;
+        return minDistanceTriangleIntersection;
     }
 
     @Override

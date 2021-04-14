@@ -7,18 +7,31 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Triangle {
-    private final static double DEFAULT_COLOR_INTENSITY = 1;
     private final static int MAX_VERTICES = 3;
 
     private List<Vector> vertices;
-    private double colorIntensity;
+    private Vector normal;
+
+    private Vector calculateNormal() {
+        Iterator<Vector> verticesIterator = vertices.iterator();
+
+        Vector vertex0 = verticesIterator.next();
+        Vector vertex1 = verticesIterator.next();
+        Vector vertex2 = verticesIterator.next();
+
+        Vector edge1 = vertex1.subtract(vertex0);
+        Vector edge2 = vertex2.subtract(vertex0);
+
+        normal = edge1.crossProduct(edge2);
+
+        return normal;
+    }
 
     private boolean isVerticesNumberCorrect(int verticesNumber) {
         return verticesNumber <= MAX_VERTICES;
     }
 
     public Triangle() {
-        this.colorIntensity = DEFAULT_COLOR_INTENSITY;
         this.vertices = new ArrayList<>(3);
     }
 
@@ -28,6 +41,12 @@ public class Triangle {
         }
 
         vertices.add(vertex);
+    }
+
+    public Vector getNormal() {
+        return normal != null
+            ? normal
+            : calculateNormal();
     }
 
     public Vector getCentroid() {
@@ -40,16 +59,8 @@ public class Triangle {
         return centroid.divide(vertices.size());
     }
 
-    public double getColorIntensity() {
-        return colorIntensity;
-    }
-
     public List<Vector> getVertices() {
         return vertices;
-    }
-
-    public void setColorIntensity(double colorIntensity) {
-        this.colorIntensity = colorIntensity;
     }
 
     @Override
