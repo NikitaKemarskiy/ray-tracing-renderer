@@ -1,6 +1,7 @@
 package org.nikita.geometry;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -27,6 +28,16 @@ public class Triangle {
         }
 
         vertices.add(vertex);
+    }
+
+    public Vector getCentroid() {
+        Vector centroid = new Vector(0, 0, 0);
+
+        for (Vector vertex : vertices) {
+            centroid = centroid.add(vertex);
+        }
+
+        return centroid.divide(vertices.size());
     }
 
     public double getColorIntensity() {

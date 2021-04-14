@@ -1,14 +1,14 @@
 package org.nikita.geometry;
 
 public class Color {
-    private byte red;
-    private byte green;
-    private byte blue;
+    private int red;
+    private int green;
+    private int blue;
 
-    public final static Color WHITE = new Color((byte) 255, (byte) 255, (byte) 255);
-    public final static Color BLACK = new Color((byte) 0, (byte) 0, (byte) 0);
+    public final static Color WHITE = new Color(255, 255, 255);
+    public final static Color BLACK = new Color(0, 0, 0);
 
-    public Color(byte red, byte green, byte blue) {
+    public Color(int red, int green, int blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;
@@ -16,25 +16,30 @@ public class Color {
 
     public Color multiply(double value) {
         return new Color(
-            (byte) (red * value),
-            (byte) (green * value),
-            (byte) (blue * value)
+            (int) (red * value),
+            (int) (green * value),
+            (int) (blue * value)
         );
     }
 
-    public byte getRed() {
+    public int getRed() {
         return this.red;
     }
 
-    public byte getGreen() {
+    public int getGreen() {
         return this.green;
     }
 
-    public byte getBlue() {
+    public int getBlue() {
         return this.blue;
     }
 
+    @Override
     public String toString() {
-        return "Pixel{red=" + this.red + ", green=" + this.green + ", blue=" + this.blue + '}';
+        return "Color{" +
+                "red=" + red +
+                ", green=" + green +
+                ", blue=" + blue +
+                '}';
     }
 }

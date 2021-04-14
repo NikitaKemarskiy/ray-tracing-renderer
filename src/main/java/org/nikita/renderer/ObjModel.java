@@ -1,6 +1,8 @@
 package org.nikita.renderer;
 
 import de.javagl.obj.*;
+import org.nikita.calculation.NormalTriangleColorIntensitySolver;
+import org.nikita.calculation.TriangleColorIntensitySolver;
 import org.nikita.geometry.*;
 import org.nikita.structure.TriangleOctree;
 import org.nikita.structure.TriangleTree;
@@ -15,8 +17,8 @@ import java.util.stream.Collectors;
 public class ObjModel {
     private Set<Triangle> triangles;
     private TriangleTree triangleTree;
-    private Vector lightSourcePosition;
     private Color color;
+    private TriangleColorIntensitySolver triangleColorIntensitySolver;
 
     private Vector getMinCoordinates() {
         Vector minCoordinates = new Vector(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
@@ -57,9 +59,16 @@ public class ObjModel {
         }
     }
 
-    public ObjModel(String source, Color color) throws IOException {
+    public ObjModel(
+        String source,
+        Color color,
+        Vector lightSourcePosition,
+        double ambientLightIntensity
+    ) throws IOException {
         this.color = color;
+
         triangles = new HashSet<>();
+        triangleColorIntensitySolver = new NormalTriangleColorIntensitySolver(ambientLightIntensity);
 
         try (InputStream inputStream = new FileInputStream(source)) {
             Obj obj = ObjUtils.convertToRenderable(ObjReader.read(inputStream));
@@ -76,6 +85,12 @@ public class ObjModel {
                     );
                     triangle.addVertex(vector);
                 }
+                triangle.setColorIntensity(
+                    triangleColorIntensitySolver.getTriangleColorIntensity(
+                        triangle,
+                        lightSourcePosition
+                    )
+                );
                 triangles.add(triangle);
             }
         }
@@ -109,10 +124,6 @@ public class ObjModel {
         }
 
         buildTree();
-    }
-
-    public void setLightSourcePosition(Vector lightSourcePosition) {
-        this.lightSourcePosition = lightSourcePosition;
     }
 
     public Color getColor() {

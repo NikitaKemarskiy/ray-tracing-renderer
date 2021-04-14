@@ -1,6 +1,6 @@
 package org.nikita.structure;
 
-import org.nikita.calculation.MollerTrumboreSolver;
+import org.nikita.calculation.MollerTrumboreRayTriangleIntersectionSolver;
 import org.nikita.calculation.RayTriangleIntersectionSolver;
 import org.nikita.geometry.Ray;
 import org.nikita.geometry.Triangle;
@@ -12,7 +12,7 @@ public class TriangleOctree implements TriangleTree {
 
     public TriangleOctree(Vector vertex1, Vector vertex2, int depth) {
         root = new TriangleBoundingBox(vertex1, vertex2, depth);
-        rayTriangleIntersectionSolver = new MollerTrumboreSolver();
+        rayTriangleIntersectionSolver = new MollerTrumboreRayTriangleIntersectionSolver();
     }
 
     public void addTriangle(Triangle triangle) {

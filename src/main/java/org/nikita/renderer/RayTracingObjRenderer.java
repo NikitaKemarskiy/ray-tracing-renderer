@@ -19,10 +19,11 @@ public class RayTracingObjRenderer implements Renderer {
     private final static Axis DEFAULT_SCREEN_WIDTH_AXIS = Axis.X;
     private final static Axis DEFAULT_SCREEN_HEIGHT_AXIS = Axis.Z;
     private final static Axis DEFAULT_SCREEN_NORMAL_AXIS = Axis.Y;
-    private final static int DEFAULT_SCREEN_PIXEL_WIDTH = 500;
-    private final static int DEFAULT_SCREEN_PIXEL_HEIGHT = 500;
-    private final static Color DEFAULT_OBJECT_COLOR = new Color((byte) 0, (byte) 255, (byte) 0);
+    private final static int DEFAULT_SCREEN_PIXEL_WIDTH = 1000;
+    private final static int DEFAULT_SCREEN_PIXEL_HEIGHT = 1000;
+    private final static Color DEFAULT_OBJECT_COLOR = new Color(0, 255, 0);
     private final static Color DEFAULT_BACKGROUND_COLOR = Color.BLACK;
+    private final static double DEFAULT_AMBIENT_LIGHT_INTENSITY = 0.1;
 
     private Image renderImageFromObjModel(
         ObjModel objModel,
@@ -64,7 +65,7 @@ public class RayTracingObjRenderer implements Renderer {
                     ? objModelColor.multiply(colorIntensity)
                     : DEFAULT_BACKGROUND_COLOR;
 
-                Pixel pixel = new Pixel(color.getRed(), color.getGreen(), color.getBlue());
+                Pixel pixel = new Pixel((byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue());
                 pixels.add(pixel);
             }
         }
@@ -78,7 +79,12 @@ public class RayTracingObjRenderer implements Renderer {
 
     @Override
     public Image render(String source) throws IOException {
-        ObjModel objModel = new ObjModel(source, DEFAULT_OBJECT_COLOR);
+        ObjModel objModel = new ObjModel(
+            source,
+            DEFAULT_OBJECT_COLOR,
+            DEFAULT_LIGHT_SOURCE_POSITION,
+            DEFAULT_AMBIENT_LIGHT_INTENSITY
+        );
         Screen screen = new Screen(
             DEFAULT_SCREEN_CENTER,
             DEFAULT_SCREEN_WIDTH_AXIS,
@@ -89,7 +95,6 @@ public class RayTracingObjRenderer implements Renderer {
         );
 
         objModel.setMin(DEFAULT_MODEL_MIN_POSITION, DEFAULT_SCREEN_NORMAL_AXIS);
-        objModel.setLightSourcePosition(DEFAULT_LIGHT_SOURCE_POSITION);
 
         return renderImageFromObjModel(
             objModel,

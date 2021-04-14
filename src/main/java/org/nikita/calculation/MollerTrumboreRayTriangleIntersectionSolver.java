@@ -6,11 +6,11 @@ import org.nikita.geometry.Vector;
 
 import java.util.Iterator;
 
-public class MollerTrumboreSolver implements RayTriangleIntersectionSolver {
+public class MollerTrumboreRayTriangleIntersectionSolver implements RayTriangleIntersectionSolver {
     private static final double EPSILON = 1e-8;
 
     @Override
-    public double intersects(Ray ray, Triangle triangle) {
+    public double getRayTriangleIntersectionDistance(Ray ray, Triangle triangle) {
         Vector origin = ray.getOrigin();
         Vector direction = ray.getDirection();
 

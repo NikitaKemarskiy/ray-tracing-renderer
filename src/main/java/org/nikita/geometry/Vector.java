@@ -57,6 +57,10 @@ public class Vector {
         };
     }
 
+    public double length() {
+        return Math.sqrt(x * x + y * y + z * z);
+    }
+
     public Vector crossProduct(Vector vector) {
         return new Vector(
             this.y * vector.z - this.z * vector.y,
@@ -69,14 +73,6 @@ public class Vector {
         return this.x * vector.x + this.y * vector.y + this.z * vector.z;
     }
 
-    public Vector subtract(Vector vector) {
-        return new Vector(
-            this.x - vector.x,
-            this.y - vector.y,
-            this.z - vector.z
-        );
-    }
-
     public Vector add(Vector vector) {
         return new Vector(
                 this.x + vector.x,
@@ -85,11 +81,27 @@ public class Vector {
         );
     }
 
+    public Vector subtract(Vector vector) {
+        return new Vector(
+            this.x - vector.x,
+            this.y - vector.y,
+            this.z - vector.z
+        );
+    }
+
     public Vector divide(Vector vector) {
         return new Vector(
-                this.x / vector.x,
-                this.y / vector.y,
-                this.z / vector.z
+            this.x / vector.x,
+            this.y / vector.y,
+            this.z / vector.z
+        );
+    }
+
+    public Vector divide(double value) {
+        return new Vector(
+            this.x / value,
+            this.y / value,
+            this.z / value
         );
     }
 

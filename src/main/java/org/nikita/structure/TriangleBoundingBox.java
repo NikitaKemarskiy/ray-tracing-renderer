@@ -187,7 +187,7 @@ public class TriangleBoundingBox {
         Triangle triangleIntersectingWithRay = null;
 
         for (Triangle triangle : triangles) {
-            double triangleIntersectionDistanceWithRay = rayTriangleIntersectionSolver.intersects(ray, triangle);
+            double triangleIntersectionDistanceWithRay = rayTriangleIntersectionSolver.getRayTriangleIntersectionDistance(ray, triangle);
 
             if (triangleIntersectionDistanceWithRay == -1) {
                 continue;
