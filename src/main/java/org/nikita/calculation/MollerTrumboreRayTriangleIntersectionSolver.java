@@ -8,6 +8,7 @@ import org.nikita.renderer.TriangleIntersection;
 import java.util.Iterator;
 
 public class MollerTrumboreRayTriangleIntersectionSolver implements RayTriangleIntersectionSolver {
+
     private static final double EPSILON = 1e-8;
 
     @Override

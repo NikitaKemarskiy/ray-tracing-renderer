@@ -1,6 +1,7 @@
 package org.nikita.geometry;
 
 public class Ray {
+
     private Vector origin;
     private Vector direction;
 

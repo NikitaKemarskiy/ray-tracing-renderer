@@ -12,26 +12,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RayTracingObjRenderer implements Renderer {
+
     private final static double DEFAULT_MODEL_MIN_POSITION = 1.5;
     private final static Vector DEFAULT_CAMERA_POSITION = new Vector(0, 0, 0);
-    private final static Vector DEFAULT_LIGHT_SOURCE_POSITION = new Vector(-1, 0, -1);
+    private final static Vector DEFAULT_LIGHT_SOURCE_POSITION = new Vector(1, -1, 1);
     private final static Vector DEFAULT_SCREEN_CENTER = new Vector(0, 1, 0);
     private final static Axis DEFAULT_SCREEN_WIDTH_AXIS = Axis.X;
     private final static Axis DEFAULT_SCREEN_HEIGHT_AXIS = Axis.Z;
     private final static Axis DEFAULT_SCREEN_NORMAL_AXIS = Axis.Y;
     private final static int DEFAULT_SCREEN_PIXEL_WIDTH = 1000;
     private final static int DEFAULT_SCREEN_PIXEL_HEIGHT = 1000;
-    private final static Color DEFAULT_OBJECT_COLOR = new Color(255, 255, 0);
+    private final static Color DEFAULT_OBJECT_COLOR = new Color(255, 0, 255);
     private final static Color DEFAULT_BACKGROUND_COLOR = Color.BLACK;
     private final static double DEFAULT_AMBIENT_LIGHT_INTENSITY = 0.1;
 
-    private Image renderImageFromObjModel(
-        ObjModel objModel,
-        Screen screen,
-        Vector cameraPosition
-    ) {
-        Image image = new Image();
-
+    private Image renderImageFromObjModel(ObjModel objModel, Screen screen, Vector cameraPosition) {
         Axis screenNormalAxis = screen.getNormalAxis();
         Axis screenWidthAxis = screen.getWidthAxis();
         Axis screenHeightAxis = screen.getHeightAxis();
@@ -61,14 +56,19 @@ public class RayTracingObjRenderer implements Renderer {
 
                 double colorIntensity = objModel.getColorIntensity(ray);
 
-                Color color = colorIntensity > 0
-                    ? objModelColor.multiply(colorIntensity)
-                    : DEFAULT_BACKGROUND_COLOR;
+                Color color;
+                if (colorIntensity > 0) {
+                    color = objModelColor.multiply(colorIntensity);
+                } else {
+                    color = DEFAULT_BACKGROUND_COLOR;
+                }
 
                 Pixel pixel = new Pixel((byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue());
                 pixels.add(pixel);
             }
         }
+
+        Image image = new Image();
 
         image.setWidth(screen.getPixelWidth());
         image.setHeight(screen.getPixelHeight());
@@ -85,6 +85,7 @@ public class RayTracingObjRenderer implements Renderer {
             DEFAULT_LIGHT_SOURCE_POSITION,
             DEFAULT_AMBIENT_LIGHT_INTENSITY
         );
+
         Screen screen = new Screen(
             DEFAULT_SCREEN_CENTER,
             DEFAULT_SCREEN_WIDTH_AXIS,
@@ -96,10 +97,6 @@ public class RayTracingObjRenderer implements Renderer {
 
         objModel.setMin(DEFAULT_MODEL_MIN_POSITION, DEFAULT_SCREEN_NORMAL_AXIS);
 
-        return renderImageFromObjModel(
-            objModel,
-            screen,
-            DEFAULT_CAMERA_POSITION
-        );
+        return renderImageFromObjModel(objModel, screen, DEFAULT_CAMERA_POSITION);
     }
 }

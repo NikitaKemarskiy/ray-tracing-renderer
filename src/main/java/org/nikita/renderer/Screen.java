@@ -3,9 +3,8 @@ package org.nikita.renderer;
 import org.nikita.geometry.Axis;
 import org.nikita.geometry.Vector;
 
-import java.math.BigDecimal;
-
 public class Screen {
+
     private final static double WIDTH = 1;
     private final static double HEIGHT = 1;
 

@@ -1,11 +1,11 @@
 package org.nikita.geometry;
 
 public class Color {
+
     private int red;
     private int green;
     private int blue;
 
-    public final static Color WHITE = new Color(255, 255, 255);
     public final static Color BLACK = new Color(0, 0, 0);
 
     public Color(int red, int green, int blue) {

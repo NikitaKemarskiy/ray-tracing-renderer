@@ -1,7 +1,7 @@
 package org.nikita;
 
 import com.paulok777.formats.Image;
-import com.paulok777.writers.PpmImageWriter;
+import com.paulok777.writers.BmpImageWriter;
 import org.nikita.renderer.RayTracingObjRenderer;
 import org.nikita.renderer.Renderer;
 
@@ -21,13 +21,12 @@ public class Controller {
             System.out.println(">>> Starting to render at: " + getCurrentDateTime());
 
             Image image = renderer.render(source);
-
             System.out.println(">>> Render finished at: " + getCurrentDateTime());
 
-            PpmImageWriter ppmImageWriter = new PpmImageWriter(new File("renders/cow.ppm"));
-            ppmImageWriter.write(image);
+            BmpImageWriter bmpImageWriter = new BmpImageWriter(new File("my.bmp"));
+            bmpImageWriter.write(image);
         } catch (IOException err) {
-            System.err.println(err);
+            System.err.println(err.getMessage());
         }
     }
 

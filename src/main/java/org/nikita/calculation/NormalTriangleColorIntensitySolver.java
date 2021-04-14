@@ -4,6 +4,7 @@ import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
 
 public class NormalTriangleColorIntensitySolver implements TriangleColorIntensitySolver {
+
     private double ambientLightIntensity;
     private Vector lightSourcePosition;
 
