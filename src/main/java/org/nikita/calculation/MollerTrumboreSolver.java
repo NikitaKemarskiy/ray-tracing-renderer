@@ -9,7 +9,7 @@ public class MollerTrumboreSolver implements RayTriangleIntersectionSolver {
     private static final double EPSILON = 1e-8;
 
     @Override
-    public boolean intersects(Vector from, Vector ray, Triangle triangle) {
+    public double intersects(Vector from, Vector ray, Triangle triangle) {
         Iterator<Vector> verticesIterator = triangle.getVertices().iterator();
 
         Vector vertex0 = verticesIterator.next();
@@ -23,7 +23,7 @@ public class MollerTrumboreSolver implements RayTriangleIntersectionSolver {
         double a = edge1.dotProduct(h);
 
         if (a > -EPSILON && a < EPSILON) {
-            return false;
+            return -1;
         }
 
         double f = 1 / a;
@@ -31,17 +31,17 @@ public class MollerTrumboreSolver implements RayTriangleIntersectionSolver {
         double u = f * s.dotProduct(h);
 
         if (u < 0 || u > 1) {
-            return false;
+            return -1;
         }
 
         Vector q = s.crossProduct(edge1);
         double v = f * ray.dotProduct(q);
         if (v < 0 || u + v > 1) {
-            return false;
+            return -1;
         }
 
         var t = f * edge2.dotProduct(q);
 
-        return t > EPSILON;
+        return t;
     }
 }

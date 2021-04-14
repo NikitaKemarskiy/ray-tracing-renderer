@@ -1,8 +1,6 @@
 package org.nikita.renderer;
 
 import de.javagl.obj.*;
-import org.nikita.calculation.MollerTrumboreSolver;
-import org.nikita.calculation.RayTriangleIntersectionSolver;
 import org.nikita.geometry.Axis;
 import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
@@ -19,7 +17,6 @@ import java.util.stream.Collectors;
 public class ObjModel {
     private TriangleTree triangleTree;
     private Set<Triangle> triangles;
-    private RayTriangleIntersectionSolver rayTriangleIntersectionSolver;
 
     private Vector getMinCoordinates() {
         Vector minCoordinates = new Vector(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
@@ -62,7 +59,6 @@ public class ObjModel {
 
     public ObjModel(String source) throws IOException {
         triangles = new HashSet<>();
-        rayTriangleIntersectionSolver = new MollerTrumboreSolver();
 
         try (InputStream inputStream = new FileInputStream(source)) {
             Obj obj = ObjUtils.convertToRenderable(ObjReader.read(inputStream));
@@ -87,12 +83,9 @@ public class ObjModel {
     }
     
     public boolean hasIntersectionWithRay(Vector from, Vector ray) {
-        for (Triangle triangle : triangleTree.getTrianglesByRay(from, ray)) {
-            if (rayTriangleIntersectionSolver.intersects(from, ray, triangle)) {
-                return true;
-            }
-        }
-        return false;
+        double intersectionDistanceWithRay = triangleTree.getTriangleIntersectionDistanceWithRay(from, ray);
+
+        return intersectionDistanceWithRay != -1 ? true : false;
     }
     
     public void setMin(double minValue, Axis axis) {
