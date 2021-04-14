@@ -172,10 +172,8 @@ public class TriangleBoundingBox {
 
         if (childrenIntersectingWithRaySortedByDistance.size() > 0) {
             for (TriangleBoundingBox child : childrenIntersectingWithRaySortedByDistance) {
-                TriangleIntersection triangleIntersectionWithRay = child.getTriangleIntersectionWithRay(
-                    ray,
-                    rayTriangleIntersectionSolver
-                );
+                TriangleIntersection triangleIntersectionWithRay =
+                        child.getTriangleIntersectionWithRay(ray, rayTriangleIntersectionSolver);
 
                 if (triangleIntersectionWithRay != null) {
                     return triangleIntersectionWithRay;

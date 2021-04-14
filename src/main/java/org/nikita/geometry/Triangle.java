@@ -44,17 +44,7 @@ public class Triangle {
     public Vector getNormal() {
         return Optional.ofNullable(normal).orElse(calculateNormal());
     }
-
-    public Vector getCentroid() {
-        Vector centroid = new Vector(0, 0, 0);
-
-        for (Vector vertex : vertices) {
-            centroid = centroid.add(vertex);
-        }
-
-        return centroid.divide(vertices.size());
-    }
-
+    
     public List<Vector> getVertices() {
         return vertices;
     }
