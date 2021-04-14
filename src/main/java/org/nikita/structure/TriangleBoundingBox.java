@@ -157,14 +157,14 @@ public class TriangleBoundingBox {
         }
     }
 
-    public double getTriangleIntersectionDistanceWithRay(
+    public Triangle getTriangleIntersectingWithRay(
         Ray ray,
         RayTriangleIntersectionSolver rayTriangleIntersectionSolver
     ) {
         double intersectionDistance = getIntersectionDistanceWithRay(ray);
 
         if (intersectionDistance == -1) {
-            return -1;
+            return null;
         }
 
         List<TriangleBoundingBox> childrenIntersectingWithRaySortedByDistance =
@@ -172,32 +172,35 @@ public class TriangleBoundingBox {
 
         if (childrenIntersectingWithRaySortedByDistance.size() > 0) {
             for (TriangleBoundingBox child : childrenIntersectingWithRaySortedByDistance) {
-                double triangleIntersectionDistanceWithRay = child.getTriangleIntersectionDistanceWithRay(
+                Triangle triangleIntersectingWithRay = child.getTriangleIntersectingWithRay(
                     ray,
                     rayTriangleIntersectionSolver
                 );
 
-                if (triangleIntersectionDistanceWithRay != -1) {
-                    return triangleIntersectionDistanceWithRay;
+                if (triangleIntersectingWithRay != null) {
+                    return triangleIntersectingWithRay;
                 }
             }
         }
 
         double minIntersectionDistanceWithRay = -1;
+        Triangle triangleIntersectingWithRay = null;
 
         for (Triangle triangle : triangles) {
             double triangleIntersectionDistanceWithRay = rayTriangleIntersectionSolver.intersects(ray, triangle);
 
-            if (
+            if (triangleIntersectionDistanceWithRay == -1) {
+                continue;
+            } else if (
                 minIntersectionDistanceWithRay == -1 ||
-                triangleIntersectionDistanceWithRay < minIntersectionDistanceWithRay &&
-                triangleIntersectionDistanceWithRay != -1
+                triangleIntersectionDistanceWithRay < minIntersectionDistanceWithRay
             ) {
                 minIntersectionDistanceWithRay = triangleIntersectionDistanceWithRay;
+                triangleIntersectingWithRay = triangle;
             }
         }
 
-        return minIntersectionDistanceWithRay;
+        return triangleIntersectingWithRay;
     }
 
     @Override

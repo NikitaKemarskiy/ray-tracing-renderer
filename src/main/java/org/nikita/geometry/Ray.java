@@ -13,15 +13,7 @@ public class Ray {
         return origin;
     }
 
-    public void setOrigin(Vector origin) {
-        this.origin = origin;
-    }
-
     public Vector getDirection() {
         return direction;
-    }
-
-    public void setDirection(Vector direction) {
-        this.direction = direction;
     }
 }

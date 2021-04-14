@@ -1,10 +1,7 @@
 package org.nikita.renderer;
 
 import de.javagl.obj.*;
-import org.nikita.geometry.Axis;
-import org.nikita.geometry.Ray;
-import org.nikita.geometry.Triangle;
-import org.nikita.geometry.Vector;
+import org.nikita.geometry.*;
 import org.nikita.structure.TriangleOctree;
 import org.nikita.structure.TriangleTree;
 
@@ -16,8 +13,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ObjModel {
-    private TriangleTree triangleTree;
     private Set<Triangle> triangles;
+    private TriangleTree triangleTree;
+    private Vector lightSourcePosition;
+    private Color color;
 
     private Vector getMinCoordinates() {
         Vector minCoordinates = new Vector(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
@@ -58,7 +57,8 @@ public class ObjModel {
         }
     }
 
-    public ObjModel(String source) throws IOException {
+    public ObjModel(String source, Color color) throws IOException {
+        this.color = color;
         triangles = new HashSet<>();
 
         try (InputStream inputStream = new FileInputStream(source)) {
@@ -83,10 +83,10 @@ public class ObjModel {
         buildTree();
     }
     
-    public boolean hasIntersectionWithRay(Ray ray) {
-        double intersectionDistanceWithRay = triangleTree.getTriangleIntersectionDistanceWithRay(ray);
+    public double getColorIntensity(Ray ray) {
+        Triangle triangleIntersectingWithRay = triangleTree.getTriangleIntersectingWithRay(ray);
 
-        return intersectionDistanceWithRay != -1 ? true : false;
+        return triangleIntersectingWithRay != null ? triangleIntersectingWithRay.getColorIntensity() : 0;
     }
     
     public void setMin(double minValue, Axis axis) {
@@ -109,6 +109,14 @@ public class ObjModel {
         }
 
         buildTree();
+    }
+
+    public void setLightSourcePosition(Vector lightSourcePosition) {
+        this.lightSourcePosition = lightSourcePosition;
+    }
+
+    public Color getColor() {
+        return color;
     }
 
     @Override

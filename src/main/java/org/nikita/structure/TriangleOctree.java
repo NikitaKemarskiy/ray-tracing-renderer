@@ -19,8 +19,8 @@ public class TriangleOctree implements TriangleTree {
         root.addTriangle(triangle);
     }
 
-    public double getTriangleIntersectionDistanceWithRay(Ray ray) {
-        return root.getTriangleIntersectionDistanceWithRay(ray, rayTriangleIntersectionSolver);
+    public Triangle getTriangleIntersectingWithRay(Ray ray) {
+        return root.getTriangleIntersectingWithRay(ray, rayTriangleIntersectionSolver);
     }
 
     @Override

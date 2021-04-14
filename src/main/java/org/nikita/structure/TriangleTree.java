@@ -5,5 +5,5 @@ import org.nikita.geometry.Triangle;
 
 public interface TriangleTree {
     void addTriangle(Triangle triangle);
-    double getTriangleIntersectionDistanceWithRay(Ray ray);
+    Triangle getTriangleIntersectingWithRay(Ray ray);
 }

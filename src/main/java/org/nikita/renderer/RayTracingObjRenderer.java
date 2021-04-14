@@ -3,6 +3,7 @@ package org.nikita.renderer;
 import com.paulok777.formats.Image;
 import com.paulok777.formats.Pixel;
 import org.nikita.geometry.Axis;
+import org.nikita.geometry.Color;
 import org.nikita.geometry.Vector;
 import org.nikita.geometry.Ray;
 
@@ -10,20 +11,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.nikita.formats.Color.BLACK;
-import static org.nikita.formats.Color.WHITE;
-
 public class RayTracingObjRenderer implements Renderer {
     private final static double DEFAULT_MODEL_MIN_POSITION = 1.5;
     private final static Vector DEFAULT_CAMERA_POSITION = new Vector(0, 0, 0);
+    private final static Vector DEFAULT_LIGHT_SOURCE_POSITION = new Vector(-1, 0, -1);
     private final static Vector DEFAULT_SCREEN_CENTER = new Vector(0, 1, 0);
     private final static Axis DEFAULT_SCREEN_WIDTH_AXIS = Axis.X;
     private final static Axis DEFAULT_SCREEN_HEIGHT_AXIS = Axis.Z;
     private final static Axis DEFAULT_SCREEN_NORMAL_AXIS = Axis.Y;
     private final static int DEFAULT_SCREEN_PIXEL_WIDTH = 500;
     private final static int DEFAULT_SCREEN_PIXEL_HEIGHT = 500;
+    private final static Color DEFAULT_OBJECT_COLOR = new Color((byte) 0, (byte) 255, (byte) 0);
+    private final static Color DEFAULT_BACKGROUND_COLOR = Color.BLACK;
 
-    private Image renderImageFromObjModel(ObjModel objModel, Screen screen, Vector cameraPosition) {
+    private Image renderImageFromObjModel(
+        ObjModel objModel,
+        Screen screen,
+        Vector cameraPosition
+    ) {
         Image image = new Image();
 
         Axis screenNormalAxis = screen.getNormalAxis();
@@ -39,6 +44,8 @@ public class RayTracingObjRenderer implements Renderer {
         double screenMinByHeightAxis = screen.getMin(screenHeightAxis);
         double screenMaxByHeightAxis = screen.getMax(screenHeightAxis);
 
+        Color objModelColor = objModel.getColor();
+
         List<Pixel> pixels = new ArrayList<>();
 
         for (double h = screenMaxByHeightAxis; h > screenMinByHeightAxis; h -= screenHeightStep) {
@@ -51,7 +58,13 @@ public class RayTracingObjRenderer implements Renderer {
 
                 Ray ray = new Ray(cameraPosition, direction);
 
-                Pixel pixel = objModel.hasIntersectionWithRay(ray) ? BLACK : WHITE;
+                double colorIntensity = objModel.getColorIntensity(ray);
+
+                Color color = colorIntensity > 0
+                    ? objModelColor.multiply(colorIntensity)
+                    : DEFAULT_BACKGROUND_COLOR;
+
+                Pixel pixel = new Pixel(color.getRed(), color.getGreen(), color.getBlue());
                 pixels.add(pixel);
             }
         }
@@ -65,7 +78,7 @@ public class RayTracingObjRenderer implements Renderer {
 
     @Override
     public Image render(String source) throws IOException {
-        ObjModel objModel = new ObjModel(source);
+        ObjModel objModel = new ObjModel(source, DEFAULT_OBJECT_COLOR);
         Screen screen = new Screen(
             DEFAULT_SCREEN_CENTER,
             DEFAULT_SCREEN_WIDTH_AXIS,
@@ -76,7 +89,12 @@ public class RayTracingObjRenderer implements Renderer {
         );
 
         objModel.setMin(DEFAULT_MODEL_MIN_POSITION, DEFAULT_SCREEN_NORMAL_AXIS);
+        objModel.setLightSourcePosition(DEFAULT_LIGHT_SOURCE_POSITION);
 
-        return renderImageFromObjModel(objModel, screen, DEFAULT_CAMERA_POSITION);
+        return renderImageFromObjModel(
+            objModel,
+            screen,
+            DEFAULT_CAMERA_POSITION
+        );
     }
 }
