@@ -2,10 +2,9 @@ package org.nikita.structure;
 
 import org.nikita.calculation.MollerTrumboreSolver;
 import org.nikita.calculation.RayTriangleIntersectionSolver;
+import org.nikita.geometry.Ray;
 import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
-
-import java.util.Set;
 
 public class TriangleOctree implements TriangleTree {
     private TriangleBoundingBox root;
@@ -20,8 +19,8 @@ public class TriangleOctree implements TriangleTree {
         root.addTriangle(triangle);
     }
 
-    public double getTriangleIntersectionDistanceWithRay(Vector from, Vector ray) {
-        return root.getTriangleIntersectionDistanceWithRay(from, ray, rayTriangleIntersectionSolver);
+    public double getTriangleIntersectionDistanceWithRay(Ray ray) {
+        return root.getTriangleIntersectionDistanceWithRay(ray, rayTriangleIntersectionSolver);
     }
 
     @Override

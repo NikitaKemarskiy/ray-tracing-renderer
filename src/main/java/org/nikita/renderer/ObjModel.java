@@ -2,6 +2,7 @@ package org.nikita.renderer;
 
 import de.javagl.obj.*;
 import org.nikita.geometry.Axis;
+import org.nikita.geometry.Ray;
 import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
 import org.nikita.structure.TriangleOctree;
@@ -82,8 +83,8 @@ public class ObjModel {
         buildTree();
     }
     
-    public boolean hasIntersectionWithRay(Vector from, Vector ray) {
-        double intersectionDistanceWithRay = triangleTree.getTriangleIntersectionDistanceWithRay(from, ray);
+    public boolean hasIntersectionWithRay(Ray ray) {
+        double intersectionDistanceWithRay = triangleTree.getTriangleIntersectionDistanceWithRay(ray);
 
         return intersectionDistanceWithRay != -1 ? true : false;
     }

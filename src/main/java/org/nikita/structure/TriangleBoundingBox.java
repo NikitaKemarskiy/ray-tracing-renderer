@@ -1,6 +1,7 @@
 package org.nikita.structure;
 
 import org.nikita.calculation.RayTriangleIntersectionSolver;
+import org.nikita.geometry.Ray;
 import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
 
@@ -25,17 +26,20 @@ public class TriangleBoundingBox {
             vertex.getZ() <= Math.max(vertex1.getZ(), vertex2.getZ());
     }
 
-    private double getIntersectionDistanceWithRay(Vector from, Vector ray) {
-        double rayXReverse = 1 / ray.getX();
-        double rayYReverse = 1 / ray.getY();
-        double rayZReverse = 1 / ray.getZ();
+    private double getIntersectionDistanceWithRay(Ray ray) {
+        Vector origin = ray.getOrigin();
+        Vector direction = ray.getDirection();
 
-        double t1 = (vertex1.getX() - from.getX()) * rayXReverse;
-        double t2 = (vertex2.getX() - from.getX()) * rayXReverse;
-        double t3 = (vertex1.getY() - from.getY()) * rayYReverse;
-        double t4 = (vertex2.getY() - from.getY()) * rayYReverse;
-        double t5 = (vertex1.getZ() - from.getZ()) * rayZReverse;
-        double t6 = (vertex2.getZ() - from.getZ()) * rayZReverse;
+        double rayXReverse = 1 / direction.getX();
+        double rayYReverse = 1 / direction.getY();
+        double rayZReverse = 1 / direction.getZ();
+
+        double t1 = (vertex1.getX() - origin.getX()) * rayXReverse;
+        double t2 = (vertex2.getX() - origin.getX()) * rayXReverse;
+        double t3 = (vertex1.getY() - origin.getY()) * rayYReverse;
+        double t4 = (vertex2.getY() - origin.getY()) * rayYReverse;
+        double t5 = (vertex1.getZ() - origin.getZ()) * rayZReverse;
+        double t6 = (vertex2.getZ() - origin.getZ()) * rayZReverse;
 
         double tMin = Math.max(Math.max(Math.min(t1, t2), Math.min(t3, t4)), Math.min(t5, t6));
         double tMax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));
@@ -49,11 +53,11 @@ public class TriangleBoundingBox {
         }
     }
 
-    private List<TriangleBoundingBox> getChildrenIntersectingWithRaySortedByDistance(Vector from, Vector ray) {
+    private List<TriangleBoundingBox> getChildrenIntersectingWithRaySortedByDistance(Ray ray) {
         List<TriangleBoundingBox> childrenIntersectingWithRaySortedByDistance = new LinkedList<>();
 
         for (TriangleBoundingBox child : children) {
-            double intersectionDistance = child.getIntersectionDistanceWithRay(from, ray);
+            double intersectionDistance = child.getIntersectionDistanceWithRay(ray);
 
             if (intersectionDistance == -1) {
                 continue;
@@ -63,30 +67,10 @@ public class TriangleBoundingBox {
         }
 
         childrenIntersectingWithRaySortedByDistance.sort(
-            Comparator.comparingDouble(child -> child.getIntersectionDistanceWithRay(from, ray))
+            Comparator.comparingDouble(child -> child.getIntersectionDistanceWithRay(ray))
         );
 
         return childrenIntersectingWithRaySortedByDistance;
-    }
-
-    private TriangleBoundingBox getClosestChildToRay(Vector from, Vector ray) {
-        double minIntersectionDistance = Double.MAX_VALUE;
-        TriangleBoundingBox closestChildToRay = null;
-
-        for (TriangleBoundingBox child : children) {
-            double intersectionDistance = child.getIntersectionDistanceWithRay(from, ray);
-
-            if (intersectionDistance == -1) {
-                continue;
-            }
-
-            if (intersectionDistance < minIntersectionDistance) {
-                minIntersectionDistance = intersectionDistance;
-                closestChildToRay = child;
-            }
-        }
-
-        return closestChildToRay;
     }
 
     private TriangleBoundingBox getChild(Vector vertex) {
@@ -174,23 +158,21 @@ public class TriangleBoundingBox {
     }
 
     public double getTriangleIntersectionDistanceWithRay(
-        Vector from,
-        Vector ray,
+        Ray ray,
         RayTriangleIntersectionSolver rayTriangleIntersectionSolver
     ) {
-        double intersectionDistance = getIntersectionDistanceWithRay(from, ray);
+        double intersectionDistance = getIntersectionDistanceWithRay(ray);
 
         if (intersectionDistance == -1) {
             return -1;
         }
 
         List<TriangleBoundingBox> childrenIntersectingWithRaySortedByDistance =
-            getChildrenIntersectingWithRaySortedByDistance(from, ray);
+            getChildrenIntersectingWithRaySortedByDistance(ray);
 
         if (childrenIntersectingWithRaySortedByDistance.size() > 0) {
             for (TriangleBoundingBox child : childrenIntersectingWithRaySortedByDistance) {
                 double triangleIntersectionDistanceWithRay = child.getTriangleIntersectionDistanceWithRay(
-                    from,
                     ray,
                     rayTriangleIntersectionSolver
                 );
@@ -204,7 +186,7 @@ public class TriangleBoundingBox {
         double minIntersectionDistanceWithRay = -1;
 
         for (Triangle triangle : triangles) {
-            double triangleIntersectionDistanceWithRay = rayTriangleIntersectionSolver.intersects(from, ray, triangle);
+            double triangleIntersectionDistanceWithRay = rayTriangleIntersectionSolver.intersects(ray, triangle);
 
             if (
                 minIntersectionDistanceWithRay == -1 ||

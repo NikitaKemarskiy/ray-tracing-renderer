@@ -4,6 +4,7 @@ import com.paulok777.formats.Image;
 import com.paulok777.formats.Pixel;
 import org.nikita.geometry.Axis;
 import org.nikita.geometry.Vector;
+import org.nikita.geometry.Ray;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,13 +43,15 @@ public class RayTracingObjRenderer implements Renderer {
 
         for (double h = screenMaxByHeightAxis; h > screenMinByHeightAxis; h -= screenHeightStep) {
             for (double w = screenMinByWidthAxis; w < screenMaxByWidthAxis; w += screenWidthStep) {
-                Vector ray = new Vector(0, 0, 0);
+                Vector direction = new Vector(0, 0, 0);
 
-                ray.setCoordinateValue(w, screenWidthAxis);
-                ray.setCoordinateValue(h, screenHeightAxis);
-                ray.setCoordinateValue(screenPositionByNormalAxis, screenNormalAxis);
+                direction.setCoordinateValue(w, screenWidthAxis);
+                direction.setCoordinateValue(h, screenHeightAxis);
+                direction.setCoordinateValue(screenPositionByNormalAxis, screenNormalAxis);
 
-                Pixel pixel = objModel.hasIntersectionWithRay(cameraPosition, ray) ? BLACK : WHITE;
+                Ray ray = new Ray(cameraPosition, direction);
+
+                Pixel pixel = objModel.hasIntersectionWithRay(ray) ? BLACK : WHITE;
                 pixels.add(pixel);
             }
         }

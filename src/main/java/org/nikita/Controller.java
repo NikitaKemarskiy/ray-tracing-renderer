@@ -11,23 +11,27 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Controller {
+    private final static DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+
     public static void main(String[] args) {
         String source = "models/cow/cow.obj";
         Renderer renderer = new RayTracingObjRenderer();
 
         try {
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-
-            System.out.println(">>> Starting to render at: " + dtf.format(LocalDateTime.now()));
+            System.out.println(">>> Starting to render at: " + getCurrentDateTime());
 
             Image image = renderer.render(source);
 
-            System.out.println(">>> Render finished at: " + dtf.format(LocalDateTime.now()));
+            System.out.println(">>> Render finished at: " + getCurrentDateTime());
 
             PpmImageWriter ppmImageWriter = new PpmImageWriter(new File("renders/cow.ppm"));
             ppmImageWriter.write(image);
         } catch (IOException err) {
             System.err.println(err);
         }
+    }
+
+    public static String getCurrentDateTime() {
+        return dateTimeFormat.format(LocalDateTime.now());
     }
 }
