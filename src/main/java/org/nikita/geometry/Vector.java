@@ -3,6 +3,7 @@ package org.nikita.geometry;
 import java.util.Objects;
 
 public class Vector {
+
     private double x;
     private double y;
     private double z;

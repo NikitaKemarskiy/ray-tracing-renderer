@@ -6,6 +6,7 @@ import org.nikita.geometry.Vector;
 import java.util.Map;
 
 public class NormalTriangleColorIntensitySolver implements TriangleColorIntensitySolver {
+
     private double ambientLightIntensity;
     private Vector lightSourcePosition;
     private Map<Vector, Vector> verticesNormals;

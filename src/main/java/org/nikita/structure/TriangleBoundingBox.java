@@ -9,6 +9,7 @@ import org.nikita.renderer.TriangleIntersection;
 import java.util.*;
 
 public class TriangleBoundingBox {
+
     private final static int CHILDREN_AMOUNT = 8;
     private final static int AXIS_DIVISION_PARTS = 2;
 
@@ -16,6 +17,13 @@ public class TriangleBoundingBox {
     private Vector vertex2;
     private Set<Triangle> triangles;
     private List<TriangleBoundingBox> children;
+
+    public TriangleBoundingBox(Vector vertex1, Vector vertex2, int depth) {
+        this.vertex1 = vertex1;
+        this.vertex2 = vertex2;
+        triangles = new HashSet<>();
+        initChildren(depth - 1);
+    }
 
     private boolean vertexBelongsTo(Vector vertex) {
         return
@@ -45,9 +53,7 @@ public class TriangleBoundingBox {
         double tMin = Math.max(Math.max(Math.min(t1, t2), Math.min(t3, t4)), Math.min(t5, t6));
         double tMax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));
 
-        if (tMax < 0) {
-            return -1;
-        } else if (tMin > tMax) {
+        if (tMax < 0 || tMin > tMax) {
             return -1;
         } else {
             return tMin;
@@ -110,15 +116,8 @@ public class TriangleBoundingBox {
         }
     }
 
-    public TriangleBoundingBox(Vector vertex1, Vector vertex2, int depth) {
-        this.vertex1 = vertex1;
-        this.vertex2 = vertex2;
-        triangles = new HashSet<>();
-        initChildren(depth - 1);
-    }
-
     public void addTriangle(Triangle triangle) {
-        /**
+        /*
          * Triangle is already in a bounding box
          */
         if (triangles.contains(triangle)) {
@@ -128,7 +127,7 @@ public class TriangleBoundingBox {
         Iterator<Vector> verticesIterator = triangle.getVertices().iterator();
         boolean triangleBelongsTo = false;
 
-        /**
+        /*
          * Iterate through all vertices
          */
         while (verticesIterator.hasNext()) {
@@ -136,16 +135,16 @@ public class TriangleBoundingBox {
             boolean vertexBelongsTo = vertexBelongsTo(vertex);
             triangleBelongsTo = triangleBelongsTo || vertexBelongsTo;
 
-            /**
+            /*
              * Vertex belongs to a bounding box
              */
             if (vertexBelongsTo) {
-                /**
+                /*
                  * Get the child to which a vertex belongs too
                  */
                 TriangleBoundingBox child = getChild(vertex);
                 if (child != null) {
-                    /**
+                    /*
                      * Add a triangle to the found child
                      */
                     child.addTriangle(triangle);
@@ -173,10 +172,8 @@ public class TriangleBoundingBox {
 
         if (childrenIntersectingWithRaySortedByDistance.size() > 0) {
             for (TriangleBoundingBox child : childrenIntersectingWithRaySortedByDistance) {
-                TriangleIntersection triangleIntersectionWithRay = child.getTriangleIntersectionWithRay(
-                    ray,
-                    rayTriangleIntersectionSolver
-                );
+                TriangleIntersection triangleIntersectionWithRay =
+                        child.getTriangleIntersectionWithRay(ray, rayTriangleIntersectionSolver);
 
                 if (triangleIntersectionWithRay != null) {
                     return triangleIntersectionWithRay;
@@ -192,10 +189,10 @@ public class TriangleBoundingBox {
 
             if (triangleIntersection == null) {
                 continue;
-            } else if (
-                minDistanceTriangleIntersection == null ||
-                triangleIntersection.getDistance() < minDistanceTriangleIntersection.getDistance()
-            ) {
+            }
+
+            if (minDistanceTriangleIntersection == null ||
+                    triangleIntersection.getDistance() < minDistanceTriangleIntersection.getDistance()) {
                 minDistanceTriangleIntersection = triangleIntersection;
             }
         }

@@ -1,12 +1,10 @@
 package org.nikita.geometry;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Triangle {
+
     private final static int MAX_VERTICES = 3;
 
     private List<Vector> vertices;
@@ -44,9 +42,7 @@ public class Triangle {
     }
 
     public Vector getNormal() {
-        return normal != null
-            ? normal
-            : calculateNormal();
+        return Optional.ofNullable(normal).orElse(calculateNormal());
     }
 
     public List<Vector> getVertices() {
@@ -69,7 +65,7 @@ public class Triangle {
     @Override
     public String toString() {
         return vertices.stream()
-            .map(vertex -> String.format(vertex.toString()))
+            .map(Vector::toString)
             .collect(Collectors.joining(", "));
     }
 }

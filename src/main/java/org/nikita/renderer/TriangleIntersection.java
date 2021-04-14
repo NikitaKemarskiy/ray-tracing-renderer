@@ -4,6 +4,7 @@ import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
 
 public class TriangleIntersection {
+
     private Triangle triangle;
     private Vector point;
     private double distance;
