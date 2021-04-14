@@ -44,7 +44,7 @@ public class Triangle {
     public Vector getNormal() {
         return Optional.ofNullable(normal).orElse(calculateNormal());
     }
-    
+
     public List<Vector> getVertices() {
         return vertices;
     }

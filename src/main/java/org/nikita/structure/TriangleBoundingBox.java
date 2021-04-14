@@ -18,6 +18,13 @@ public class TriangleBoundingBox {
     private Set<Triangle> triangles;
     private List<TriangleBoundingBox> children;
 
+    public TriangleBoundingBox(Vector vertex1, Vector vertex2, int depth) {
+        this.vertex1 = vertex1;
+        this.vertex2 = vertex2;
+        triangles = new HashSet<>();
+        initChildren(depth - 1);
+    }
+
     private boolean vertexBelongsTo(Vector vertex) {
         return
             vertex.getX() >= Math.min(vertex1.getX(), vertex2.getX()) &&
@@ -107,13 +114,6 @@ public class TriangleBoundingBox {
                 }
             }
         }
-    }
-
-    public TriangleBoundingBox(Vector vertex1, Vector vertex2, int depth) {
-        this.vertex1 = vertex1;
-        this.vertex2 = vertex2;
-        triangles = new HashSet<>();
-        initChildren(depth - 1);
     }
 
     public void addTriangle(Triangle triangle) {

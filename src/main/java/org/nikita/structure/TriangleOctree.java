@@ -17,10 +17,12 @@ public class TriangleOctree implements TriangleTree {
         rayTriangleIntersectionSolver = new MollerTrumboreRayTriangleIntersectionSolver();
     }
 
+    @Override
     public void addTriangle(Triangle triangle) {
         root.addTriangle(triangle);
     }
 
+    @Override
     public TriangleIntersection getTriangleIntersectionWithRay(Ray ray) {
         return root.getTriangleIntersectionWithRay(ray, rayTriangleIntersectionSolver);
     }
