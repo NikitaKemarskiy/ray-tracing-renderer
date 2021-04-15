@@ -11,11 +11,9 @@ public class Triangle {
     private Vector normal;
 
     private Vector calculateNormal() {
-        Iterator<Vector> verticesIterator = vertices.iterator();
-
-        Vector vertex0 = verticesIterator.next();
-        Vector vertex1 = verticesIterator.next();
-        Vector vertex2 = verticesIterator.next();
+        Vector vertex0 = vertices.get(0);
+        Vector vertex1 = vertices.get(1);
+        Vector vertex2 = vertices.get(2);
 
         Vector edge1 = vertex1.subtract(vertex0);
         Vector edge2 = vertex2.subtract(vertex0);
@@ -33,16 +31,29 @@ public class Triangle {
         this.vertices = new ArrayList<>(3);
     }
 
-    public void addVertex(Vector vertex) {
+    public Triangle addVertex(Vector vertex) {
         if (!isVerticesNumberCorrect(vertices.size() + 1)) {
             throw new IndexOutOfBoundsException("Vertices number exceeded");
         }
 
         vertices.add(vertex);
+
+        return this;
     }
 
     public Vector getNormal() {
         return Optional.ofNullable(normal).orElse(calculateNormal());
+    }
+
+    public double getArea() {
+        Vector vertex0 = vertices.get(0);
+        Vector vertex1 = vertices.get(1);
+        Vector vertex2 = vertices.get(2);
+
+        Vector edge1 = vertex1.subtract(vertex0);
+        Vector edge2 = vertex2.subtract(vertex0);
+
+        return edge1.crossProduct(edge2).length() / 2;
     }
 
     public List<Vector> getVertices() {

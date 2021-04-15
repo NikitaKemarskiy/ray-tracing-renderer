@@ -7,6 +7,7 @@ import org.nikita.geometry.Vector;
 import org.nikita.renderer.TriangleIntersection;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TriangleBoundingBox {
 
@@ -61,7 +62,7 @@ public class TriangleBoundingBox {
     }
 
     private List<TriangleBoundingBox> getChildrenIntersectingWithRaySortedByDistance(Ray ray) {
-        List<TriangleBoundingBox> childrenIntersectingWithRaySortedByDistance = new LinkedList<>();
+        Map<TriangleBoundingBox, Double> childrenIntersectionDistanceMap = new HashMap<>();
 
         for (TriangleBoundingBox child : children) {
             double intersectionDistance = child.getIntersectionDistanceWithRay(ray);
@@ -70,12 +71,15 @@ public class TriangleBoundingBox {
                 continue;
             }
 
-            childrenIntersectingWithRaySortedByDistance.add(child);
+            childrenIntersectionDistanceMap.put(child, intersectionDistance);
         }
 
-        childrenIntersectingWithRaySortedByDistance.sort(
-            Comparator.comparingDouble(child -> child.getIntersectionDistanceWithRay(ray))
-        );
+        List<TriangleBoundingBox> childrenIntersectingWithRaySortedByDistance = childrenIntersectionDistanceMap
+            .entrySet()
+            .stream()
+            .sorted(Map.Entry.comparingByValue())
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
 
         return childrenIntersectingWithRaySortedByDistance;
     }

@@ -3,6 +3,7 @@ package org.nikita.calculation;
 import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
 
+import java.util.Iterator;
 import java.util.Map;
 
 public class NormalTriangleColorIntensitySolver implements TriangleColorIntensitySolver {
@@ -37,22 +38,24 @@ public class NormalTriangleColorIntensitySolver implements TriangleColorIntensit
     public Vector getTrianglePointNormal(Triangle triangle, Vector point) {
         Vector trianglePointNormal = new Vector(0, 0, 0);
 
-        double totalDistanceReverse = triangle.getVertices()
-            .stream()
-            .map(vertex -> 1 / vertex.getDistance(point))
-            .reduce(0.0, Double::sum);
+        double triangleArea = triangle.getArea();
 
-        double totalDistance = triangle.getVertices()
-            .stream()
-            .map(vertex -> vertex.getDistance(point))
-            .reduce(0.0, Double::sum);
+        Vector[] vertices = {
+            triangle.getVertices().get(0),
+            triangle.getVertices().get(1),
+            triangle.getVertices().get(2)
+        };
 
-        for (Vector vertex : triangle.getVertices()) {
-            Vector vertexNormal = verticesNormals.get(vertex);
-            double vertexToPointDistanceReverse = 1 / vertex.getDistance(point);
+        Triangle[] innerTriangles = {
+            new Triangle().addVertex(vertices[1]).addVertex(vertices[2]).addVertex(point),
+            new Triangle().addVertex(vertices[0]).addVertex(vertices[2]).addVertex(point),
+            new Triangle().addVertex(vertices[0]).addVertex(vertices[1]).addVertex(point)
+        };
 
+        for (int i = 0; i < vertices.length; i++) {
+            Vector vertexNormal = verticesNormals.get(vertices[i]);
             trianglePointNormal = trianglePointNormal.add(
-                vertexNormal.multiply(vertexToPointDistanceReverse / totalDistanceReverse)
+                vertexNormal.multiply(innerTriangles[i].getArea() / triangleArea)
             );
         }
 

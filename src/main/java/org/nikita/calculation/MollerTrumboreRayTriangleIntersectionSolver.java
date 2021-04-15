@@ -5,8 +5,6 @@ import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
 import org.nikita.renderer.TriangleIntersection;
 
-import java.util.Iterator;
-
 public class MollerTrumboreRayTriangleIntersectionSolver implements RayTriangleIntersectionSolver {
     private static final double EPSILON = 1e-9;
 
@@ -15,11 +13,9 @@ public class MollerTrumboreRayTriangleIntersectionSolver implements RayTriangleI
         Vector origin = ray.getOrigin();
         Vector direction = ray.getDirection();
 
-        Iterator<Vector> verticesIterator = triangle.getVertices().iterator();
-
-        Vector vertex0 = verticesIterator.next();
-        Vector vertex1 = verticesIterator.next();
-        Vector vertex2 = verticesIterator.next();
+        Vector vertex0 = triangle.getVertices().get(0);
+        Vector vertex1 = triangle.getVertices().get(1);
+        Vector vertex2 = triangle.getVertices().get(2);
 
         Vector edge1 = vertex1.subtract(vertex0);
         Vector edge2 = vertex2.subtract(vertex0);
