@@ -9,4 +9,6 @@ public interface TriangleTree {
     void addTriangle(Triangle triangle);
 
     TriangleIntersection getTriangleIntersectionWithRay(Ray ray);
+
+    TriangleBoundingBox getRoot();
 }

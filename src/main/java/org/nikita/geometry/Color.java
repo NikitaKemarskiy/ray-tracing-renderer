@@ -6,8 +6,6 @@ public class Color {
     private int green;
     private int blue;
 
-    public final static Color BLACK = new Color(0, 0, 0);
-
     public Color(int red, int green, int blue) {
         this.red = red;
         this.green = green;

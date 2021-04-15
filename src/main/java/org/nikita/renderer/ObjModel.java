@@ -1,11 +1,9 @@
 package org.nikita.renderer;
 
 import de.javagl.obj.*;
-import org.nikita.calculation.NormalTriangleColorIntensitySolver;
 import org.nikita.calculation.TriangleColorIntensitySolver;
-import org.nikita.geometry.*;
 import org.nikita.geometry.Vector;
-import org.nikita.structure.TriangleOctree;
+import org.nikita.geometry.*;
 import org.nikita.structure.TriangleTree;
 import org.nikita.util.MapUtil;
 
@@ -16,11 +14,45 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ObjModel {
+
     private Set<Triangle> triangles;
-    private Map<Vector, Vector> verticesNormals;
-    private TriangleTree triangleTree;
-    private Color color;
+    private Color objectColor;
+    private Color backgroundColor;
     private TriangleColorIntensitySolver triangleColorIntensitySolver;
+    private TriangleTree triangleTree;
+
+    public ObjModel(Color objectColor, Color backgroundColor,
+                    TriangleColorIntensitySolver triangleColorIntensitySolver, TriangleTree triangleTree) {
+        this.objectColor = objectColor;
+        this.backgroundColor = backgroundColor;
+        this.triangleColorIntensitySolver = triangleColorIntensitySolver;
+        this.triangleTree = triangleTree;
+        this.triangles = new HashSet<>();
+    }
+
+    public void populateTriangles(String source) throws IOException {
+        try (InputStream inputStream = new FileInputStream(source)) {
+            Obj obj = ObjUtils.convertToRenderable(ObjReader.read(inputStream));
+
+            for (int faceIndex = 0; faceIndex < obj.getNumFaces(); faceIndex++) {
+                ObjFace face = obj.getFace(faceIndex);
+                Triangle triangle = new Triangle();
+                for (int vertexNumber = 0; vertexNumber < face.getNumVertices(); vertexNumber++) {
+                    int vertexIndex = face.getVertexIndex(vertexNumber);
+                    FloatTuple floatTuple = obj.getVertex(vertexIndex);
+
+                    Vector vertex = new Vector(
+                            floatTuple.getX(),
+                            floatTuple.getY(),
+                            floatTuple.getZ()
+                    );
+
+                    triangle.addVertex(vertex);
+                }
+                triangles.add(triangle);
+            }
+        }
+    }
 
     private Vector getMinCoordinates() {
         Vector minCoordinates = new Vector(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
@@ -54,7 +86,10 @@ public class ObjModel {
         Vector minCoordinates = getMinCoordinates();
         Vector maxCoordinates = getMaxCoordinates();
 
-        triangleTree = new TriangleOctree(minCoordinates, maxCoordinates, 3);
+        triangleTree.getRoot().setVertex1(minCoordinates);
+        triangleTree.getRoot().setVertex2(maxCoordinates);
+        triangleTree.getRoot().setTriangles(new HashSet<>());
+        triangleTree.getRoot().initChildren(2);
 
         for (Triangle triangle : triangles) {
             triangleTree.addTriangle(triangle);
@@ -88,50 +123,11 @@ public class ObjModel {
             vertexNormal = vertexNormal.divide(triangles.size());
 
             for (Vector vertex : vertices) {
-                verticesNormals.put(vertex, vertexNormal);
+                triangleColorIntensitySolver.addVerticesNormals(vertex, vertexNormal);
             }
         }
     }
 
-    public ObjModel(
-        String source,
-        Color color,
-        Vector lightSourcePosition,
-        double ambientLightIntensity
-    ) throws IOException {
-        this.color = color;
-
-        triangles = new HashSet<>();
-        verticesNormals = new HashMap<>();
-        triangleColorIntensitySolver = new NormalTriangleColorIntensitySolver(
-            ambientLightIntensity,
-            lightSourcePosition,
-            verticesNormals
-        );
-
-        try (InputStream inputStream = new FileInputStream(source)) {
-            Obj obj = ObjUtils.convertToRenderable(ObjReader.read(inputStream));
-
-            for (int faceIndex = 0; faceIndex < obj.getNumFaces(); faceIndex++) {
-                ObjFace face = obj.getFace(faceIndex);
-                Triangle triangle = new Triangle();
-                for (int vertexNumber = 0; vertexNumber < face.getNumVertices(); vertexNumber++) {
-                    int vertexIndex = face.getVertexIndex(vertexNumber);
-                    FloatTuple floatTuple = obj.getVertex(vertexIndex);
-
-                    Vector vertex = new Vector(
-                        floatTuple.getX(),
-                        floatTuple.getY(),
-                        floatTuple.getZ()
-                    );
-
-                    triangle.addVertex(vertex);
-                }
-                triangles.add(triangle);
-            }
-        }
-    }
-    
     public double getColorIntensity(Ray ray) {
         TriangleIntersection triangleIntersectionWithRay = triangleTree.getTriangleIntersectionWithRay(ray);
 
@@ -160,7 +156,7 @@ public class ObjModel {
                     case X -> vertex.setX(vertex.getX() + diff);
                     case Y -> vertex.setY(vertex.getY() + diff);
                     case Z -> vertex.setZ(vertex.getZ() + diff);
-                };
+                }
             }
         }
     }
@@ -171,7 +167,11 @@ public class ObjModel {
     }
 
     public Color getColor() {
-        return color;
+        return objectColor;
+    }
+
+    public Color getBackgroundColor() {
+        return backgroundColor;
     }
 
     @Override

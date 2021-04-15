@@ -3,7 +3,7 @@ package org.nikita.calculation;
 import org.nikita.geometry.Triangle;
 import org.nikita.geometry.Vector;
 
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.Map;
 
 public class NormalTriangleColorIntensitySolver implements TriangleColorIntensitySolver {
@@ -12,14 +12,10 @@ public class NormalTriangleColorIntensitySolver implements TriangleColorIntensit
     private Vector lightSourcePosition;
     private Map<Vector, Vector> verticesNormals;
 
-    public NormalTriangleColorIntensitySolver(
-        double ambientLightIntensity,
-        Vector lightSourcePosition,
-        Map<Vector, Vector> verticesNormals
-    ) {
+    public NormalTriangleColorIntensitySolver(double ambientLightIntensity, Vector lightSourcePosition) {
         this.ambientLightIntensity = ambientLightIntensity;
         this.lightSourcePosition = lightSourcePosition;
-        this.verticesNormals = verticesNormals;
+        verticesNormals = new HashMap<>();
     }
 
     @Override
@@ -35,7 +31,12 @@ public class NormalTriangleColorIntensitySolver implements TriangleColorIntensit
         return Math.max(ambientLightIntensity, cos);
     }
 
-    public Vector getTrianglePointNormal(Triangle triangle, Vector point) {
+    @Override
+    public void addVerticesNormals(Vector vertex, Vector vertexNormal) {
+        verticesNormals.put(vertex, vertexNormal);
+    }
+
+    private Vector getTrianglePointNormal(Triangle triangle, Vector point) {
         Vector trianglePointNormal = new Vector(0, 0, 0);
 
         double triangleArea = triangle.getArea();

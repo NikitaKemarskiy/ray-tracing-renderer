@@ -19,6 +19,10 @@ public class TriangleBoundingBox {
     private Set<Triangle> triangles;
     private List<TriangleBoundingBox> children;
 
+    public TriangleBoundingBox() {
+
+    }
+
     public TriangleBoundingBox(Vector vertex1, Vector vertex2, int depth) {
         this.vertex1 = vertex1;
         this.vertex2 = vertex2;
@@ -74,14 +78,12 @@ public class TriangleBoundingBox {
             childrenIntersectionDistanceMap.put(child, intersectionDistance);
         }
 
-        List<TriangleBoundingBox> childrenIntersectingWithRaySortedByDistance = childrenIntersectionDistanceMap
+        return childrenIntersectionDistanceMap
             .entrySet()
             .stream()
             .sorted(Map.Entry.comparingByValue())
             .map(Map.Entry::getKey)
             .collect(Collectors.toList());
-
-        return childrenIntersectingWithRaySortedByDistance;
     }
 
     private TriangleBoundingBox getChild(Vector vertex) {
@@ -94,7 +96,7 @@ public class TriangleBoundingBox {
         return null;
     }
 
-    private void initChildren(int depth) {
+    public void initChildren(int depth) {
         children = new ArrayList<>(CHILDREN_AMOUNT);
 
         if (depth != 0) {
@@ -202,6 +204,18 @@ public class TriangleBoundingBox {
         }
 
         return minDistanceTriangleIntersection;
+    }
+
+    public void setVertex1(Vector vertex1) {
+        this.vertex1 = vertex1;
+    }
+
+    public void setVertex2(Vector vertex2) {
+        this.vertex2 = vertex2;
+    }
+
+    public void setTriangles(Set<Triangle> triangles) {
+        this.triangles = triangles;
     }
 
     @Override
