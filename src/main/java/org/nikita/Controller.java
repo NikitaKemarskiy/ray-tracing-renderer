@@ -25,13 +25,11 @@ public class Controller {
     }
 
     public void run(String[] args) {
-        args = new String[] { "--source=models/cow/cow.obj", "--output=renders/cow.bmp" };
-
-        if (args.length != 2) {
-            throw new IllegalArgumentException("You should pass 2 parameters");
-        }
-
         try {
+            if (args.length != 2) {
+                throw new IllegalArgumentException("You should pass 2 parameters");
+            }
+
             Map<String, String> mapArgs = parse(args);
 
             System.out.println(">>> Starting to render at: " + getCurrentDateTime());
