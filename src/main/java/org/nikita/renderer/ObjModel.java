@@ -1,10 +1,8 @@
 package org.nikita.renderer;
 
 import de.javagl.obj.*;
-import org.nikita.calculation.TriangleColorIntensitySolver;
 import org.nikita.geometry.Vector;
 import org.nikita.geometry.*;
-import org.nikita.structure.TriangleTree;
 import org.nikita.util.MapUtil;
 
 import java.io.IOException;
@@ -17,15 +15,13 @@ public class ObjModel {
     private Set<Triangle> triangles;
     private Color objectColor;
     private Color backgroundColor;
-    private TriangleColorIntensitySolver triangleColorIntensitySolver;
-    private TriangleTree triangleTree;
 
-    public ObjModel(Color objectColor, Color backgroundColor,
-                    TriangleColorIntensitySolver triangleColorIntensitySolver, TriangleTree triangleTree) {
+    public ObjModel(
+        Color objectColor,
+        Color backgroundColor
+    ) {
         this.objectColor = objectColor;
         this.backgroundColor = backgroundColor;
-        this.triangleColorIntensitySolver = triangleColorIntensitySolver;
-        this.triangleTree = triangleTree;
         this.triangles = new HashSet<>();
     }
 
@@ -51,7 +47,7 @@ public class ObjModel {
         }
     }
 
-    private Vector getMinCoordinates() {
+    public Vector getMinCoordinates() {
         Vector minCoordinates = new Vector(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
 
         for (Triangle triangle : triangles) {
@@ -65,7 +61,7 @@ public class ObjModel {
         return minCoordinates;
     }
 
-    private Vector getMaxCoordinates() {
+    public Vector getMaxCoordinates() {
         Vector maxCoordinates = new Vector(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
 
         for (Triangle triangle : triangles) {
@@ -77,65 +73,6 @@ public class ObjModel {
         }
 
         return maxCoordinates;
-    }
-
-    private void buildTree() {
-        Vector minCoordinates = getMinCoordinates();
-        Vector maxCoordinates = getMaxCoordinates();
-
-        triangleTree.getRoot().setVertex1(minCoordinates);
-        triangleTree.getRoot().setVertex2(maxCoordinates);
-        triangleTree.getRoot().setTriangles(new HashSet<>());
-        triangleTree.getRoot().initChildren(2);
-
-        for (Triangle triangle : triangles) {
-            triangleTree.addTriangle(triangle);
-        }
-    }
-
-    private void buildVerticesNormals(
-    ) {
-        Map<Integer, List<Vector>> vertexCoordinatesVerticesMap = new HashMap<>();
-        Map<Integer, List<Triangle>> vertexCoordinatesTrianglesMap = new HashMap<>();
-
-        for (Triangle triangle : triangles) {
-            for (Vector vertex : triangle.getVertices()) {
-                MapUtil.addToList(vertexCoordinatesVerticesMap, vertex.hashCode(), vertex);
-                MapUtil.addToList(vertexCoordinatesTrianglesMap, vertex.hashCode(), triangle);
-            }
-        }
-
-        for (Map.Entry<Integer, List<Vector>> entry : vertexCoordinatesVerticesMap.entrySet()) {
-            int vertexHash = entry.getKey();
-            List<Vector> vertices = entry.getValue();
-
-            List<Triangle> triangles = vertexCoordinatesTrianglesMap.get(vertexHash);
-
-            Vector vertexNormal = new Vector(0, 0, 0);
-
-            for (Triangle triangle : triangles) {
-                vertexNormal = vertexNormal.add(triangle.getNormal());
-            }
-
-            vertexNormal = vertexNormal.divide(triangles.size());
-
-            for (Vector vertex : vertices) {
-                triangleColorIntensitySolver.addVerticesNormals(vertex, vertexNormal);
-            }
-        }
-    }
-
-    public double getColorIntensity(Ray ray) {
-        TriangleIntersection triangleIntersectionWithRay = triangleTree.getTriangleIntersectionWithRay(ray);
-
-        if (triangleIntersectionWithRay == null) {
-            return 0;
-        }
-
-        return triangleColorIntensitySolver.getTrianglePointColorIntensity(
-            triangleIntersectionWithRay.getTriangle(),
-            triangleIntersectionWithRay.getPoint()
-        );
     }
     
     public void setMin(double minValue, Axis axis) {
@@ -158,17 +95,16 @@ public class ObjModel {
         }
     }
 
-    public void init() {
-        buildTree();
-        buildVerticesNormals();
-    }
-
     public Color getColor() {
         return objectColor;
     }
 
     public Color getBackgroundColor() {
         return backgroundColor;
+    }
+
+    public Set<Triangle> getTriangles() {
+        return triangles;
     }
 
     @Override

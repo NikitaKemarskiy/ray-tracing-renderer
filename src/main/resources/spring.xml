@@ -60,8 +60,6 @@
     <bean id="objModel" class="org.nikita.renderer.ObjModel">
         <constructor-arg ref="objectColor"/>
         <constructor-arg ref="backgroundColor"/>
-        <constructor-arg ref="triangleColorIntensitySolver"/>
-        <constructor-arg ref="triangleTree"/>
     </bean>
 
     <bean id="screen" class="org.nikita.renderer.Screen">
@@ -85,6 +83,8 @@
         <constructor-arg ref="camera"/>
         <constructor-arg ref="objModel"/>
         <constructor-arg ref="screen"/>
+        <constructor-arg ref="triangleTree"/>
+        <constructor-arg ref="triangleColorIntensitySolver"/>
     </bean>
 
     <bean id="controller" class="org.nikita.Controller">

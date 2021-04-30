@@ -2,15 +2,15 @@ package org.nikita.renderer;
 
 import com.paulok777.formats.Image;
 import com.paulok777.formats.Pixel;
-import org.nikita.geometry.Axis;
-import org.nikita.geometry.Color;
+import org.nikita.calculation.TriangleColorIntensitySolver;
+import org.nikita.geometry.*;
 import org.nikita.geometry.Vector;
-import org.nikita.geometry.Ray;
+import org.nikita.structure.TriangleTree;
+import org.nikita.util.MapUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class RayTracingObjRenderer implements Renderer {
 
@@ -18,21 +18,92 @@ public class RayTracingObjRenderer implements Renderer {
     private Vector camera;
     private ObjModel objModel;
     private Screen screen;
+    private TriangleTree triangleTree;
+    private TriangleColorIntensitySolver triangleColorIntensitySolver;
 
-    public RayTracingObjRenderer(double modelMinPosition, Vector camera, ObjModel objModel, Screen screen) {
+    public RayTracingObjRenderer(
+        double modelMinPosition,
+        Vector camera,
+        ObjModel objModel,
+        Screen screen,
+        TriangleTree triangleTree,
+        TriangleColorIntensitySolver triangleColorIntensitySolver
+    ) {
         this.modelMinPosition = modelMinPosition;
         this.camera = camera;
         this.objModel = objModel;
         this.screen = screen;
+        this.triangleTree = triangleTree;
+        this.triangleColorIntensitySolver = triangleColorIntensitySolver;
     }
 
     @Override
     public Image render(InputStream inputStream) throws IOException {
         objModel.populateTriangles(inputStream);
         objModel.setMin(modelMinPosition, screen.getNormalAxis());
-        objModel.init();
+
+        buildVerticesNormals(objModel);
+        buildTree(objModel);
 
         return renderImageFromObjModel(objModel, screen, camera);
+    }
+
+    private void buildTree(ObjModel objModel) {
+        Vector minCoordinates = objModel.getMinCoordinates();
+        Vector maxCoordinates = objModel.getMaxCoordinates();
+
+        triangleTree.getRoot().setVertex1(minCoordinates);
+        triangleTree.getRoot().setVertex2(maxCoordinates);
+        triangleTree.getRoot().setTriangles(new HashSet<>());
+        triangleTree.getRoot().initChildren(2);
+
+        for (Triangle triangle : objModel.getTriangles()) {
+            triangleTree.addTriangle(triangle);
+        }
+    }
+
+    private void buildVerticesNormals(ObjModel objModel) {
+        Map<Integer, List<Vector>> vertexCoordinatesVerticesMap = new HashMap<>();
+        Map<Integer, List<Triangle>> vertexCoordinatesTrianglesMap = new HashMap<>();
+
+        for (Triangle triangle : objModel.getTriangles()) {
+            for (Vector vertex : triangle.getVertices()) {
+                MapUtil.addToList(vertexCoordinatesVerticesMap, vertex.hashCode(), vertex);
+                MapUtil.addToList(vertexCoordinatesTrianglesMap, vertex.hashCode(), triangle);
+            }
+        }
+
+        for (Map.Entry<Integer, List<Vector>> entry : vertexCoordinatesVerticesMap.entrySet()) {
+            int vertexHash = entry.getKey();
+            List<Vector> vertices = entry.getValue();
+
+            List<Triangle> triangles = vertexCoordinatesTrianglesMap.get(vertexHash);
+
+            Vector vertexNormal = new Vector(0, 0, 0);
+
+            for (Triangle triangle : triangles) {
+                vertexNormal = vertexNormal.add(triangle.getNormal());
+            }
+
+            vertexNormal = vertexNormal.divide(triangles.size());
+
+            for (Vector vertex : vertices) {
+                triangleColorIntensitySolver.addVerticesNormals(vertex, vertexNormal);
+            }
+        }
+    }
+
+    private double getColorIntensity(ObjModel objModel, Ray ray) {
+        TriangleIntersection triangleIntersectionWithRay = triangleTree.getTriangleIntersectionWithRay(ray);
+
+        if (triangleIntersectionWithRay == null) {
+            return 0;
+        }
+
+        return triangleColorIntensitySolver.getTrianglePointColorIntensity(
+                triangleIntersectionWithRay.getTriangle(),
+                triangleIntersectionWithRay.getPoint()
+        );
     }
 
     private Image renderImageFromObjModel(ObjModel objModel, Screen screen, Vector cameraPosition) {
@@ -63,7 +134,7 @@ public class RayTracingObjRenderer implements Renderer {
 
                 Ray ray = new Ray(cameraPosition, direction);
 
-                double colorIntensity = objModel.getColorIntensity(ray);
+                double colorIntensity = getColorIntensity(objModel, ray);
 
                 Color color;
                 if (colorIntensity > 0) {
