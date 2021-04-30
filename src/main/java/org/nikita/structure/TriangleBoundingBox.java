@@ -74,14 +74,12 @@ public class TriangleBoundingBox {
             childrenIntersectionDistanceMap.put(child, intersectionDistance);
         }
 
-        List<TriangleBoundingBox> childrenIntersectingWithRaySortedByDistance = childrenIntersectionDistanceMap
+        return childrenIntersectionDistanceMap
             .entrySet()
             .stream()
             .sorted(Map.Entry.comparingByValue())
             .map(Map.Entry::getKey)
             .collect(Collectors.toList());
-
-        return childrenIntersectingWithRaySortedByDistance;
     }
 
     private TriangleBoundingBox getChild(Vector vertex) {
@@ -177,7 +175,7 @@ public class TriangleBoundingBox {
         if (childrenIntersectingWithRaySortedByDistance.size() > 0) {
             for (TriangleBoundingBox child : childrenIntersectingWithRaySortedByDistance) {
                 TriangleIntersection triangleIntersectionWithRay =
-                        child.getTriangleIntersectionWithRay(ray, rayTriangleIntersectionSolver);
+                    child.getTriangleIntersectionWithRay(ray, rayTriangleIntersectionSolver);
 
                 if (triangleIntersectionWithRay != null) {
                     return triangleIntersectionWithRay;
@@ -195,8 +193,10 @@ public class TriangleBoundingBox {
                 continue;
             }
 
-            if (minDistanceTriangleIntersection == null ||
-                    triangleIntersection.getDistance() < minDistanceTriangleIntersection.getDistance()) {
+            if (
+                minDistanceTriangleIntersection == null ||
+                triangleIntersection.getDistance() < minDistanceTriangleIntersection.getDistance()
+            ) {
                 minDistanceTriangleIntersection = triangleIntersection;
             }
         }

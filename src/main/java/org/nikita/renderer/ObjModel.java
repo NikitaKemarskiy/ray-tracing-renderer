@@ -94,7 +94,7 @@ public class ObjModel {
     }
 
     public ObjModel(
-        String source,
+        InputStream inputStream,
         Color color,
         Vector lightSourcePosition,
         double ambientLightIntensity
@@ -109,26 +109,24 @@ public class ObjModel {
             verticesNormals
         );
 
-        try (InputStream inputStream = new FileInputStream(source)) {
-            Obj obj = ObjUtils.convertToRenderable(ObjReader.read(inputStream));
+        Obj obj = ObjUtils.convertToRenderable(ObjReader.read(inputStream));
 
-            for (int faceIndex = 0; faceIndex < obj.getNumFaces(); faceIndex++) {
-                ObjFace face = obj.getFace(faceIndex);
-                Triangle triangle = new Triangle();
-                for (int vertexNumber = 0; vertexNumber < face.getNumVertices(); vertexNumber++) {
-                    int vertexIndex = face.getVertexIndex(vertexNumber);
-                    FloatTuple floatTuple = obj.getVertex(vertexIndex);
+        for (int faceIndex = 0; faceIndex < obj.getNumFaces(); faceIndex++) {
+            ObjFace face = obj.getFace(faceIndex);
+            Triangle triangle = new Triangle();
+            for (int vertexNumber = 0; vertexNumber < face.getNumVertices(); vertexNumber++) {
+                int vertexIndex = face.getVertexIndex(vertexNumber);
+                FloatTuple floatTuple = obj.getVertex(vertexIndex);
 
-                    Vector vertex = new Vector(
-                        floatTuple.getX(),
-                        floatTuple.getY(),
-                        floatTuple.getZ()
-                    );
+                Vector vertex = new Vector(
+                    floatTuple.getX(),
+                    floatTuple.getY(),
+                    floatTuple.getZ()
+                );
 
-                    triangle.addVertex(vertex);
-                }
-                triangles.add(triangle);
+                triangle.addVertex(vertex);
             }
+            triangles.add(triangle);
         }
     }
     
