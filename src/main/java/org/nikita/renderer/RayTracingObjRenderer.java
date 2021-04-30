@@ -20,6 +20,7 @@ public class RayTracingObjRenderer implements Renderer {
     private Screen screen;
     private TriangleTree triangleTree;
     private TriangleColorIntensitySolver triangleColorIntensitySolver;
+    private Color backgroundColor;
 
     public RayTracingObjRenderer(
         double modelMinPosition,
@@ -27,7 +28,8 @@ public class RayTracingObjRenderer implements Renderer {
         ObjModel objModel,
         Screen screen,
         TriangleTree triangleTree,
-        TriangleColorIntensitySolver triangleColorIntensitySolver
+        TriangleColorIntensitySolver triangleColorIntensitySolver,
+        Color backgroundColor
     ) {
         this.modelMinPosition = modelMinPosition;
         this.camera = camera;
@@ -35,6 +37,7 @@ public class RayTracingObjRenderer implements Renderer {
         this.screen = screen;
         this.triangleTree = triangleTree;
         this.triangleColorIntensitySolver = triangleColorIntensitySolver;
+        this.backgroundColor = backgroundColor;
     }
 
     @Override
@@ -93,7 +96,7 @@ public class RayTracingObjRenderer implements Renderer {
         }
     }
 
-    private double getColorIntensity(ObjModel objModel, Ray ray) {
+    private double getColorIntensity(Ray ray) {
         TriangleIntersection triangleIntersectionWithRay = triangleTree.getTriangleIntersectionWithRay(ray);
 
         if (triangleIntersectionWithRay == null) {
@@ -101,8 +104,8 @@ public class RayTracingObjRenderer implements Renderer {
         }
 
         return triangleColorIntensitySolver.getTrianglePointColorIntensity(
-                triangleIntersectionWithRay.getTriangle(),
-                triangleIntersectionWithRay.getPoint()
+            triangleIntersectionWithRay.getTriangle(),
+            triangleIntersectionWithRay.getPoint()
         );
     }
 
@@ -134,13 +137,13 @@ public class RayTracingObjRenderer implements Renderer {
 
                 Ray ray = new Ray(cameraPosition, direction);
 
-                double colorIntensity = getColorIntensity(objModel, ray);
+                double colorIntensity = getColorIntensity(ray);
 
                 Color color;
                 if (colorIntensity > 0) {
                     color = objModelColor.multiply(colorIntensity);
                 } else {
-                    color = objModel.getBackgroundColor();
+                    color = backgroundColor;
                 }
 
                 Pixel pixel = new Pixel((byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue());

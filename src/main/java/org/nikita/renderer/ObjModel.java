@@ -3,7 +3,6 @@ package org.nikita.renderer;
 import de.javagl.obj.*;
 import org.nikita.geometry.Vector;
 import org.nikita.geometry.*;
-import org.nikita.util.MapUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,14 +13,9 @@ public class ObjModel {
 
     private Set<Triangle> triangles;
     private Color objectColor;
-    private Color backgroundColor;
 
-    public ObjModel(
-        Color objectColor,
-        Color backgroundColor
-    ) {
+    public ObjModel(Color objectColor) {
         this.objectColor = objectColor;
-        this.backgroundColor = backgroundColor;
         this.triangles = new HashSet<>();
     }
 
@@ -97,10 +91,6 @@ public class ObjModel {
 
     public Color getColor() {
         return objectColor;
-    }
-
-    public Color getBackgroundColor() {
-        return backgroundColor;
     }
 
     public Set<Triangle> getTriangles() {
