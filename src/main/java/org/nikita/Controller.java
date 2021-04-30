@@ -9,6 +9,9 @@ import com.paulok777.writers.PpmImageWriter;
 import org.nikita.renderer.Renderer;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -25,26 +28,34 @@ public class Controller {
     }
 
     public void run(String[] args) {
-        args = new String[] { "--source=models/cow/cow.obj", "--output=renders/cow.bmp" };
-
-        if (args.length != 2) {
-            throw new IllegalArgumentException("You should pass 2 parameters");
-        }
-
         try {
+            if (args.length != 2) {
+                throw new IllegalArgumentException("You should pass 2 parameters");
+            }
+
             Map<String, String> mapArgs = parse(args);
+            String source = mapArgs.get(Arguments.SOURCE);
+            String output = mapArgs.get(Arguments.OUTPUT);
 
-            System.out.println(">>> Starting to render at: " + getCurrentDateTime());
-
-            Image image = renderer.render(mapArgs.get(Arguments.SOURCE));
-
-            System.out.println(">>> Render finished at: " + getCurrentDateTime());
-
-            ImageWriter writer = getWriter(mapArgs.get(Arguments.OUTPUT));
-            writer.write(image);
+            render(source, output);
         } catch (Exception err) {
             System.err.println(err.getMessage());
         }
+    }
+
+    private void render(String source, String output) throws IOException {
+        System.out.println(">>> Starting to render at: " + getCurrentDateTime());
+
+        Image image;
+        try (InputStream inputStream = new FileInputStream(source)) {
+            image = renderer.render(inputStream);
+        }
+
+        System.out.println(">>> Render finished at: " + getCurrentDateTime());
+
+        ImageWriter writer = getWriter(output);
+
+        writer.write(image);
     }
 
     private String getCurrentDateTime() {

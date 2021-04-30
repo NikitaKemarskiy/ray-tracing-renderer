@@ -10,3 +10,6 @@ models/*
 
 # OS files
 .DS_Store
+
+# Generated files
+dependency-reduced-pom.xml

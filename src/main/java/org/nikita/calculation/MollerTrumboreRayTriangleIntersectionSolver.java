@@ -6,6 +6,7 @@ import org.nikita.geometry.Vector;
 import org.nikita.renderer.TriangleIntersection;
 
 public class MollerTrumboreRayTriangleIntersectionSolver implements RayTriangleIntersectionSolver {
+
     private static final double EPSILON = 1e-9;
 
     @Override
