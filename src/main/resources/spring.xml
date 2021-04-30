@@ -72,8 +72,8 @@
         <constructor-arg>
             <value type="org.nikita.geometry.Axis">Y</value>
         </constructor-arg>
-        <constructor-arg value="1000"/>
-        <constructor-arg value="1000"/>
+        <constructor-arg value="2000"/>
+        <constructor-arg value="2000"/>
     </bean>
 
     <alias name="rayTracingObjRenderer" alias="renderer"/>

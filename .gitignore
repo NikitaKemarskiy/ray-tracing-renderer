@@ -3,8 +3,6 @@
 target
 
 # Project files
-renders/*
-!renders/.gitkeep
 models/*
 !models/.gitkeep
 
